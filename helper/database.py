@@ -1,12 +1,12 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from config import MONGO_URI, MONGO_DB, MONGO_COLLECTION
+from bot.config import Config
 
 class SettingsDB:
     def __init__(self):
         # Connect to MongoDB using Motor
-        self.client = AsyncIOMotorClient(MONGO_URI)
-        self.db = self.client[MONGO_DB]
-        self.collection = self.db[MONGO_COLLECTION]
+        self.client = AsyncIOMotorClient(Config.MONGO_URI)
+        self.db = self.client[Config.DB_NAME]
+        self.collection = self.db[Config.COLLECTION_NAME]
 
         # Default values
         self.defaults = {
