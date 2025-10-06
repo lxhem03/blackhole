@@ -12,7 +12,6 @@ class Database:
         "preset": "veryfast",
         "resolution": "640x360",
         "audio_b": "64k",
-        "codec": "libx264",
         "audio_codec": "aac",
         "video_codec": "libx264",
         "video_bitrate": 0,
@@ -54,13 +53,6 @@ class Database:
     
     async def set_preset(self, value):
         await self.collection.replace_one({"_id": "preset"}, {"_id": "preset", "value": value}, upsert=True)
-    
-    async def get_codec(self):
-        doc = await self.collection.find_one({"_id": "codec"})
-        return doc["value"] if doc else self.defaults["codec"]
-    
-    async def set_codec(self, value):
-        await self.collection.replace_one({"_id": "codec"}, {"_id": "codec", "value": value}, upsert=True)
     
     async def get_audio_codec(self):
         doc = await self.collection.find_one({"_id": "audio_codec"})
