@@ -98,91 +98,91 @@ if __name__ == "__main__" :
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["preset", f"preset@{BOT_USERNAME}"]))
-async def changepr(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            preset_val = message.text.split(" ", maxsplit=1)[1]
-            await db.set_preset(preset_val)
-            OUT = f"<blockquote>I will be using : {preset_val} preset</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide a preset value, e.g., /preset veryfast</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+    @app.on_message(filters.incoming & filters.command(["preset", f"preset@{BOT_USERNAME}"]))
+    async def changepr(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                preset_val = message.text.split(" ", maxsplit=1)[1]
+                await db.set_preset(preset_val)
+                OUT = f"<blockquote>I will be using : {preset_val} preset</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a preset value, e.g., /preset veryfast</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["v_codec", f"v_codec@{BOT_USERNAME}"]))
-async def changevcodec(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            codec_val = message.text.split(" ", maxsplit=1)[1]
-            await db.set_video_codec(codec_val)
-            OUT = f"<blockquote>I will be using : {codec_val} video codec</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide a video codec value, e.g., /v_codec libx264</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+    @app.on_message(filters.incoming & filters.command(["v_codec", f"v_codec@{BOT_USERNAME}"]))
+    async def changevcodec(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                codec_val = message.text.split(" ", maxsplit=1)[1]
+                await db.set_video_codec(codec_val)
+                OUT = f"<blockquote>I will be using : {codec_val} video codec</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a video codec value, e.g., /v_codec libx264</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))
-async def changeab(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            aud = message.text.split(" ", maxsplit=1)[1]
-            await db.set_audio_b(aud)
-            OUT = f"<blockquote>I will be using : {aud} audio bitrate</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+    @app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))
+    async def changeab(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                aud = message.text.split(" ", maxsplit=1)[1]
+                await db.set_audio_b(aud)
+                OUT = f"<blockquote>I will be using : {aud} audio bitrate</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["a_codec", f"a_codec@{BOT_USERNAME}"]))
-async def changeacodec(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            codec_val = message.text.split(" ", maxsplit=1)[1]
-            await db.set_audio_codec(codec_val)
-            OUT = f"<blockquote>I will be using : {codec_val} audio codec</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide an audio codec value, e.g., /a_codec aac</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+    @app.on_message(filters.incoming & filters.command(["a_codec", f"a_codec@{BOT_USERNAME}"]))
+    async def changeacodec(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                codec_val = message.text.split(" ", maxsplit=1)[1]
+                await db.set_audio_codec(codec_val)
+                OUT = f"<blockquote>I will be using : {codec_val} audio codec</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide an audio codec value, e.g., /a_codec aac</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["v_bitrate", f"v_bitrate@{BOT_USERNAME}"]))
-async def changevbitrate(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            br = message.text.split(" ", maxsplit=1)[1]
-            br_int = int(br)  # Validate as integer (0 for None)
-            await db.set_video_bitrate(br_int)
-            display = "no video bitrate (auto)" if br_int == 0 else f"{br_int}"
-            OUT = f"<blockquote>I will be using : {display} video bitrate</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide a video bitrate value, e.g., /v_bitrate 1000 (or 0 for none/auto)</blockquote>")
-        except ValueError:
-            await message.reply_text("<blockquote>Video bitrate must be an integer, e.g., 1000 or 0</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+    @app.on_message(filters.incoming & filters.command(["v_bitrate", f"v_bitrate@{BOT_USERNAME}"]))
+    async def changevbitrate(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                br = message.text.split(" ", maxsplit=1)[1]
+                br_int = int(br)  # Validate as integer (0 for None)
+                await db.set_video_bitrate(br_int)
+                display = "no video bitrate (auto)" if br_int == 0 else f"{br_int}"
+                OUT = f"<blockquote>I will be using : {display} video bitrate</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a video bitrate value, e.g., /v_bitrate 1000 (or 0 for none/auto)</blockquote>")
+            except ValueError:
+                await message.reply_text("<blockquote>Video bitrate must be an integer, e.g., 1000 or 0</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-@app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))
-async def changewatermark(app, message):
-    if message.from_user.id in AUTH_USERS:
-        try:
-            wm = message.text.split(" ", maxsplit=1)[1]
-            if wm.strip().lower() in ["0", "none", ""]:
-                await db.set_watermark(0)
-                OUT = f"<blockquote>I will be using : no watermark</blockquote>"
-            else:
-                await db.set_watermark(wm)
-                OUT = f"<blockquote>I will be using : {wm} watermark</blockquote>"
-            await message.reply_text(OUT)
-        except IndexError:
-            await message.reply_text("<blockquote>Please provide a watermark value, e.g., /watermark My Text Here (or 0/none for no watermark)</blockquote>")
-    else:
-        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")        
+    @app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))
+    async def changewatermark(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                wm = message.text.split(" ", maxsplit=1)[1]
+                if wm.strip().lower() in ["0", "none", ""]:
+                    await db.set_watermark(0)
+                    OUT = f"<blockquote>I will be using : no watermark</blockquote>"
+                else:
+                    await db.set_watermark(wm)
+                    OUT = f"<blockquote>I will be using : {wm} watermark</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a watermark value, e.g., /watermark My Text Here (or 0/none for no watermark)</blockquote>")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")        
         
     @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
     async def help_message(app, message):
