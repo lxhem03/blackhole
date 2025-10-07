@@ -1,4 +1,3 @@
-# oof
 from datetime import datetime as dt
 import os, asyncio, pyrogram, psutil, platform
 from bot import (
@@ -224,7 +223,34 @@ if __name__ == "__main__" :
     @app.on_message(filters.incoming & filters.command(["settings", f"settings@{BOT_USERNAME}"]))
     async def settings(app, message):
         if message.from_user.id in AUTH_USERS:
-            await message.reply_text(f"<b>Tʜᴇ Cᴜʀʀᴇɴᴛ Sᴇᴛᴛɪɴɢꜱ ᴡɪʟʟ ʙᴇ Aᴅᴅᴇᴅ Yᴏᴜʀ Vɪᴅᴇᴏ Fɪʟᴇ ⚙️:</b>\n<blockquote><b>➥ Codec</b> : {codec[0]} \n<b>➥ Crf</b> : {crf[0]} \n<b>➥ Resolution</b> : {resolution[0]} \n<b>➥ Preset</b> : {preset[0]} \n<b>➥ Audio Bitrates</b> : {audio_b[0]}</blockquote>\n<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>")
+            crf_val = await db.get_crf()
+            preset_val = await db.get_preset()
+            resolution_val = await db.get_resolution()
+            audio_b_val = await db.get_audio_b()
+            audio_codec_val = await db.get_audio_codec()
+            video_codec_val = await db.get_video_codec()
+            video_bitrate_val = await db.get_video_bitrate()
+            watermark_val = await db.get_watermark()
+
+            # Format optional values nicely
+            video_bitrate_display = "Auto/None" if video_bitrate_val is None else f"{video_bitrate_val}"
+            watermark_display = "None" if watermark_val is None else f"{watermark_val}"
+
+            reply_text = (
+                f"<b>Tʜᴇ Cᴜʀʀᴇɴᴛ Sᴇᴛᴛɪɴɢꜱ ᴡɪʟʟ ʙᴇ Aᴅᴅᴇᴅ Yᴏᴜʀ Vɪᴅᴇᴏ Fɪʟᴇ ⚙️:</b>\n"
+                f"<blockquote>"
+                f"<b>➥ Video Codec</b> : {video_codec_val} \n"
+                f"<b>➥ Audio Codec</b> : {audio_codec_val} \n"
+                f"<b>➥ Crf</b> : {crf_val} \n"
+                f"<b>➥ Resolution</b> : {resolution_val} \n"
+                f"<b>➥ Preset</b> : {preset_val} \n"
+                f"<b>➥ Audio Bitrate</b> : {audio_b_val} \n"
+                f"<b>➥ Video Bitrate</b> : {video_bitrate_display} \n"
+                f"<b>➥ Watermark</b> : {watermark_display}"
+                f"</blockquote>\n"
+                f"<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>"
+            )
+            await message.reply_text(reply_text)
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
             
