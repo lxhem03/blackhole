@@ -10,15 +10,8 @@ from bot import (
     TG_BOT_TOKEN,
     BOT_USERNAME,
     SESSION_NAME,
-    
     data,
-    app,
-    crf,
-    resolution,
-    audio_b,
-    preset,
-    codec,
-    watermark 
+    app
 )
 from bot.helper_funcs.utils import add_task, on_task_complete, sysinfo
 from pyrogram import Client, filters
@@ -40,14 +33,9 @@ from bot.plugins.status_message_fn import (
 
 from bot.commands import Command
 from bot.plugins.call_back_button_handler import button
-sudo_users = "7660990923" 
-crf.append("32")
-codec.append("libx264")
-resolution.append("640x360")
-preset.append("ultrafast")
-audio_b.append("40k")
-# 🤣
+from helper.database import db
 
+sudo_users = "7660990923" 
 
 uptime = dt.now()
 
@@ -80,59 +68,121 @@ if __name__ == "__main__" :
     )
     app.add_handler(incoming_start_message_handler)
     
+
     @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))
     async def changecrf(app, message):
         if message.from_user.id in AUTH_USERS:
-            cr = message.text.split(" ", maxsplit=1)[1]
-            OUT = f"<blockquote>I will be using : {cr} crf</blockquote>"
-            crf.insert(0, f"{cr}")
-            await message.reply_text(OUT)
+            try:
+                cr = message.text.split(" ", maxsplit=1)[1]
+                cr_int = int(cr)  # Validate as integer
+                await db.set_crf(cr_int)
+                OUT = f"<blockquote>I will be using : {cr} crf</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a CRF value, e.g., /crf 24</blockquote>")
+            except ValueError:
+                await message.reply_text("<blockquote>CRF must be an integer, e.g., 24</blockquote>")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
-            
 
-    @app.on_message(filters.incoming & filters.command(["resolution", f"resolution@{BOT_USERNAME}"]))
+    @app.on_messae(filters.incoming & filters.command(["resolution", f"resolution@{BOT_USERNAME}"]))
     async def changer(app, message):
         if message.from_user.id in AUTH_USERS:
-            r = message.text.split(" ", maxsplit=1)[1]
-            OUT = f"<blockquote>I will be using : {r} </blockquote>"
-            resolution.insert(0, f"{r}")
-            await message.reply_text(OUT)
+            try:
+                res = message.text.split(" ", maxsplit=1)[1]
+                await db.set_resolution(res)
+                OUT = f"<blockquote>I will be using : {res} </blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a resolution value, e.g., /resolution 640x360</blockquote>")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-               
-    @app.on_message(filters.incoming & filters.command(["preset", f"preset@{BOT_USERNAME}"]))
-    async def changepr(app, message):
-        if message.from_user.id in AUTH_USERS:
-            pop = message.text.split(" ", maxsplit=1)[1]
-            OUT = f"<blockquote>I will be using : {pop} preset</blockquote>"
-            preset.insert(0, f"{pop}")
+@app.on_message(filters.incoming & filters.command(["preset", f"preset@{BOT_USERNAME}"]))
+async def changepr(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
+            preset_val = message.text.split(" ", maxsplit=1)[1]
+            await db.set_preset(preset_val)
+            OUT = f"<blockquote>I will be using : {preset_val} preset</blockquote>"
             await message.reply_text(OUT)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide a preset value, e.g., /preset veryfast</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-            
-    @app.on_message(filters.incoming & filters.command(["codec", f"codec@{BOT_USERNAME}"]))
-    async def changecode(app, message):
-        if message.from_user.id in AUTH_USERS:
-            col = message.text.split(" ", maxsplit=1)[1]
-            OUT = f"<blockquote>I will be using : {col} codec</blockquote>"
-            codec.insert(0, f"{col}")
+@app.on_message(filters.incoming & filters.command(["v_codec", f"v_codec@{BOT_USERNAME}"]))
+async def changevcodec(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
+            codec_val = message.text.split(" ", maxsplit=1)[1]
+            await db.set_video_codec(codec_val)
+            OUT = f"<blockquote>I will be using : {codec_val} video codec</blockquote>"
             await message.reply_text(OUT)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
-             
-    @app.on_message(filters.incoming & filters.command(["audio", f"audio@{BOT_USERNAME}"]))
-    async def changea(app, message):
-        if message.from_user.id in AUTH_USERS:
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide a video codec value, e.g., /v_codec libx264</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+@app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))
+async def changeab(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
             aud = message.text.split(" ", maxsplit=1)[1]
-            OUT = f"<blockquote>I will be using : {aud} audio</blockquote>"
-            audio_b.insert(0, f"{aud}")
+            await db.set_audio_b(aud)
+            OUT = f"<blockquote>I will be using : {aud} audio bitrate</blockquote>"
             await message.reply_text(OUT)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
-            
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+@app.on_message(filters.incoming & filters.command(["a_codec", f"a_codec@{BOT_USERNAME}"]))
+async def changeacodec(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
+            codec_val = message.text.split(" ", maxsplit=1)[1]
+            await db.set_audio_codec(codec_val)
+            OUT = f"<blockquote>I will be using : {codec_val} audio codec</blockquote>"
+            await message.reply_text(OUT)
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide an audio codec value, e.g., /a_codec aac</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+@app.on_message(filters.incoming & filters.command(["v_bitrate", f"v_bitrate@{BOT_USERNAME}"]))
+async def changevbitrate(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
+            br = message.text.split(" ", maxsplit=1)[1]
+            br_int = int(br)  # Validate as integer (0 for None)
+            await db.set_video_bitrate(br_int)
+            display = "no video bitrate (auto)" if br_int == 0 else f"{br_int}"
+            OUT = f"<blockquote>I will be using : {display} video bitrate</blockquote>"
+            await message.reply_text(OUT)
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide a video bitrate value, e.g., /v_bitrate 1000 (or 0 for none/auto)</blockquote>")
+        except ValueError:
+            await message.reply_text("<blockquote>Video bitrate must be an integer, e.g., 1000 or 0</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+@app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))
+async def changewatermark(app, message):
+    if message.from_user.id in AUTH_USERS:
+        try:
+            wm = message.text.split(" ", maxsplit=1)[1]
+            if wm.strip().lower() in ["0", "none", ""]:
+                await db.set_watermark(0)
+                OUT = f"<blockquote>I will be using : no watermark</blockquote>"
+            else:
+                await db.set_watermark(wm)
+                OUT = f"<blockquote>I will be using : {wm} watermark</blockquote>"
+            await message.reply_text(OUT)
+        except IndexError:
+            await message.reply_text("<blockquote>Please provide a watermark value, e.g., /watermark My Text Here (or 0/none for no watermark)</blockquote>")
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")        
         
     @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
     async def help_message(app, message):
