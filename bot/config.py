@@ -4,24 +4,24 @@ class Config(object):
     #Session
     SESSION_NAME = get_config("SESSION_NAME", "EncoderX") 
     #Telegram Credentials 
-    APP_ID = int(get_config("APP_ID", "26387127"))
-    API_HASH = get_config("API_HASH", "19718ab7acd97d0f71ada2807ddfe47a")
+    APP_ID = int(get_config("APP_ID", "27394279"))
+    API_HASH = get_config("API_HASH", "90a9aa4c31afa3750da5fd686c410851")
 
     # Bot Credentials 
-    TG_BOT_TOKEN = get_config("TG_BOT_TOKEN", "7672683596:AAE2pJ95BtP15Mi7xZS7kCYy78y5EoQxK40")
-    BOT_USERNAME = get_config("BOT_USERNAME", "Tjggursgjybot")
+    TG_BOT_TOKEN = get_config("TG_BOT_TOKEN", "7567477886:AAEbL5Smfy69KUN2lX38Wp5FIZ-sggC5JSE")
+    BOT_USERNAME = get_config("BOT_USERNAME", "MarinXkitagawabot")
 
     # User or group id 
-    AUTH_USERS = [7660990923, -1002762108584]
+    AUTH_USERS = [7465574522, -4651470400]
 
     #Channels
-    LOG_CHANNEL = get_config("LOG_CHANNEL", "Lod_krishna")
+    LOG_CHANNEL = get_config("LOG_CHANNEL", "itsme123c")
     UPDATES_CHANNEL = get_config("UPDATES_CHANNEL", None) # Without `@` LOL
 
     #Mongo DB: (Added by @Telegram_Guyz in github 🌚) 
-    MONGO_URI = get_config("MONGO_URI", "") #Required 
-    DB_NAME = get_config("DB_NAME", "") #Required
-    COLLECTION_NAME = get_config("COLLECTION_NAME", "") #Required
+    MONGO_URI = get_config("MONGO_URI", "mongodb+srv://python21java:8ZFGYMKJCqAPwsiO@filestore.f876hjv.mongodb.net/?retryWrites=true&w=majority&appName=Filestore") #Required 
+    DB_NAME = get_config("DB_NAME", "TRY") #Required
+    COLLECTION_NAME = get_config("COLLECTION_NAME", "att") #Required
 
     
     # Download location of your server 
