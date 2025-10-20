@@ -84,7 +84,7 @@ if __name__ == "__main__" :
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
-    @app.on_messae(filters.incoming & filters.command(["resolution", f"resolution@{BOT_USERNAME}"]))
+    @app.on_message(filters.incoming & filters.command(["resolution", f"resolution@{BOT_USERNAME}"]))
     async def changer(app, message):
         if message.from_user.id in AUTH_USERS:
             try:
