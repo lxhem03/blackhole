@@ -1,3 +1,14 @@
+import logging
+
+logging.getLogger("pymongo").setLevel(logging.INFO)
+logging.getLogger("motor").setLevel(logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
+
 from datetime import datetime as dt
 import os, asyncio, pyrogram, psutil, platform
 from bot import (
@@ -33,6 +44,9 @@ from bot.plugins.status_message_fn import (
 from bot.commands import Command
 from bot.plugins.call_back_button_handler import button
 from helper.database import db
+from pyrogram import Client, filters
+from pyrogram.errors import FloodWait
+from motor.motor_asyncio import MotorClientError
 
 sudo_users = "7660990923" 
 
@@ -66,7 +80,7 @@ if __name__ == "__main__" :
         filters=filters.command(["start", f"start@{BOT_USERNAME}"])
     )
     app.add_handler(incoming_start_message_handler)
-    
+
 
     @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))
     async def changecrf(app, message):
@@ -81,6 +95,15 @@ if __name__ == "__main__" :
                 await message.reply_text("<blockquote>Please provide a CRF value, e.g., /crf 24</blockquote>")
             except ValueError:
                 await message.reply_text("<blockquote>CRF must be an integer, e.g., 24</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save CRF value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /crf: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /crf: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -94,6 +117,15 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a resolution value, e.g., /resolution 640x360</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save resolution value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /resolution: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /resolution: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -107,6 +139,15 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a preset value, e.g., /preset veryfast</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save preset value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /preset: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /preset: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -120,19 +161,15 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a video codec value, e.g., /v_codec libx264</blockquote>")
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
-
-    @app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))
-    async def changeab(app, message):
-        if message.from_user.id in AUTH_USERS:
-            try:
-                aud = message.text.split(" ", maxsplit=1)[1]
-                await db.set_audio_b(aud)
-                OUT = f"<blockquote>I will be using : {aud} audio bitrate</blockquote>"
-                await message.reply_text(OUT)
-            except IndexError:
-                await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save video codec value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /v_codec: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /v_codec: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -146,6 +183,37 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide an audio codec value, e.g., /a_codec aac</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save audio codec value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /a_codec: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /a_codec: {e}")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+    @app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))
+    async def changeab(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                aud = message.text.split(" ", maxsplit=1)[1]
+                await db.set_audio_b(aud)
+                OUT = f"<blockquote>I will be using : {aud} audio bitrate</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save audio bitrate value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /audio_b: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /audio_b: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -163,6 +231,15 @@ if __name__ == "__main__" :
                 await message.reply_text("<blockquote>Please provide a video bitrate value, e.g., /v_bitrate 1000 (or 0 for none/auto)</blockquote>")
             except ValueError:
                 await message.reply_text("<blockquote>Video bitrate must be an integer, e.g., 1000 or 0</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save video bitrate value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /v_bitrate: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /v_bitrate: {e}")
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
@@ -180,8 +257,61 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a watermark value, e.g., /watermark My Text Here (or 0/none for no watermark)</blockquote>")
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not save watermark value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /watermark: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /watermark: {e}")
         else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")        
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+
+    @app.on_message(filters.incoming & filters.command(["settings", f"settings@{BOT_USERNAME}"]))
+    async def settings(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                crf_val = await db.get_crf()
+                preset_val = await db.get_preset()
+                resolution_val = await db.get_resolution()
+                audio_b_val = await db.get_audio_b()
+                audio_codec_val = await db.get_audio_codec()
+                video_codec_val = await db.get_video_codec()
+                video_bitrate_val = await db.get_video_bitrate()
+                watermark_val = await db.get_watermark()
+
+                video_bitrate_display = "Auto/None" if video_bitrate_val is None else f"{video_bitrate_val}"
+                watermark_display = "None" if watermark_val is None else f"{watermark_val}"
+
+                reply_text = (
+                    f"<b>Tʜᴇ Cᴜʀʀᴇɴᴛ Sᴇᴛᴛɪɴɢꜱ ᴡɪʟʟ ʙᴇ Aᴅᴅᴇᴅ Yᴏᴜʀ Vɪᴅᴇᴏ Fɪʟᴇ ⚙️:</b>\n"
+                    f"<blockquote>"
+                    f"<b>➥ Video Codec</b> : {video_codec_val} \n"
+                    f"<b>➥ Audio Codec</b> : {audio_codec_val} \n"
+                    f"<b>➥ Crf</b> : {crf_val} \n"
+                    f"<b>➥ Resolution</b> : {resolution_val} \n"
+                    f"<b>➥ Preset</b> : {preset_val} \n"
+                    f"<b>➥ Audio Bitrate</b> : {audio_b_val} \n"
+                    f"<b>➥ Video Bitrate</b> : {video_bitrate_display} \n"
+                    f"<b>➥ Watermark</b> : {watermark_display}"
+                    f"</blockquote>\n"
+                    f"<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>"
+                )
+                await message.reply_text(reply_text)
+            except MotorClientError as e:
+                await message.reply_text("<blockquote>Database error: Could not retrieve settings. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /settings: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /settings: {e}")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")   
+
         
     @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
     async def help_message(app, message):
@@ -218,41 +348,6 @@ if __name__ == "__main__" :
         if len(data) == 1:
          await query.delete()   
          await add_task(message)
-            
-
-    @app.on_message(filters.incoming & filters.command(["settings", f"settings@{BOT_USERNAME}"]))
-    async def settings(app, message):
-        if message.from_user.id in AUTH_USERS:
-            crf_val = await db.get_crf()
-            preset_val = await db.get_preset()
-            resolution_val = await db.get_resolution()
-            audio_b_val = await db.get_audio_b()
-            audio_codec_val = await db.get_audio_codec()
-            video_codec_val = await db.get_video_codec()
-            video_bitrate_val = await db.get_video_bitrate()
-            watermark_val = await db.get_watermark()
-
-            # Format optional values nicely
-            video_bitrate_display = "Auto/None" if video_bitrate_val is None else f"{video_bitrate_val}"
-            watermark_display = "None" if watermark_val is None else f"{watermark_val}"
-
-            reply_text = (
-                f"<b>Tʜᴇ Cᴜʀʀᴇɴᴛ Sᴇᴛᴛɪɴɢꜱ ᴡɪʟʟ ʙᴇ Aᴅᴅᴇᴅ Yᴏᴜʀ Vɪᴅᴇᴏ Fɪʟᴇ ⚙️:</b>\n"
-                f"<blockquote>"
-                f"<b>➥ Video Codec</b> : {video_codec_val} \n"
-                f"<b>➥ Audio Codec</b> : {audio_codec_val} \n"
-                f"<b>➥ Crf</b> : {crf_val} \n"
-                f"<b>➥ Resolution</b> : {resolution_val} \n"
-                f"<b>➥ Preset</b> : {preset_val} \n"
-                f"<b>➥ Audio Bitrate</b> : {audio_b_val} \n"
-                f"<b>➥ Video Bitrate</b> : {video_bitrate_display} \n"
-                f"<b>➥ Watermark</b> : {watermark_display}"
-                f"</blockquote>\n"
-                f"<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>"
-            )
-            await message.reply_text(reply_text)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
             
     @app.on_message(filters.incoming & filters.command(["sysinfo", f"sysinfo@{BOT_USERNAME}"]))
     async def help_message(app, message):
