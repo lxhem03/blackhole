@@ -3,9 +3,19 @@ from bot.config import Config
 
 class Database:
     def __init__(self):
-        self.client = AsyncIOMotorClient(Config.MONGO_URI)
+        self.client = AsyncIOMotorClient(
+            Config.MONGO_URI,
+            maxPoolSize=50,
+            minPoolSize=5,
+            serverSelectionTimeoutMS=5000
+        )
         self.db = self.client[Config.DB_NAME]
         self.collection = self.db[Config.COLLECTION_NAME]
+        try:
+            self.client.admin.command('ping')
+            print("MongoDB connection successful")
+        except Exception as e:
+            print(f"MongoDB connection failed: {e}")
     
     defaults = {
         "crf": 24,
