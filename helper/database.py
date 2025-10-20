@@ -27,7 +27,7 @@ class Database:
     
     async def get_watermark(self):
         doc = await self.collection.find_one({"_id": "watermark"})
-        value = return doc["value"] if doc else self.defaults["watermark"]
+        value = doc["value"] if doc else self.defaults["watermark"]
         return None if value == 0 else value
     
     async def set_watermark(self, value):
