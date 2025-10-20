@@ -19,8 +19,8 @@ class Config(object):
     UPDATES_CHANNEL = get_config("UPDATES_CHANNEL", None) # Without `@` LOL
 
     #Mongo DB: (Added by @Telegram_Guyz in github 🌚) 
-    MONGO_URI = get_config("MONGO_URI", "mongodb+srv://python21java:8ZFGYMKJCqAPwsiO@filestore.f876hjv.mongodb.net/?retryWrites=true&w=majority&appName=Filestore") #Required 
-    DB_NAME = get_config("DB_NAME", "TRY") #Required
+    MONGO_URI = get_config("MONGO_URI", "mongodb+srv://RahulPrince720:Q7qg69E1oH30LT6d@cluster0.fb0ldjk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0") #Required 
+    DB_NAME = get_config("DB_NAME", "popoo") #Required
     COLLECTION_NAME = get_config("COLLECTION_NAME", "att") #Required
 
     
