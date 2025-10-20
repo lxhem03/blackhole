@@ -46,7 +46,7 @@ from bot.plugins.call_back_button_handler import button
 from helper.database import db
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
-from motor.motor_asyncio import MotorClientError
+from pymongo.errors import PyMongoError
 
 sudo_users = "7660990923" 
 
@@ -81,7 +81,6 @@ if __name__ == "__main__" :
     )
     app.add_handler(incoming_start_message_handler)
 
-
     @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))
     async def changecrf(app, message):
         if message.from_user.id in AUTH_USERS:
@@ -95,7 +94,7 @@ if __name__ == "__main__" :
                 await message.reply_text("<blockquote>Please provide a CRF value, e.g., /crf 24</blockquote>")
             except ValueError:
                 await message.reply_text("<blockquote>CRF must be an integer, e.g., 24</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save CRF value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /crf: {e}")
             except FloodWait as e:
@@ -117,7 +116,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a resolution value, e.g., /resolution 640x360</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save resolution value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /resolution: {e}")
             except FloodWait as e:
@@ -139,7 +138,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a preset value, e.g., /preset veryfast</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save preset value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /preset: {e}")
             except FloodWait as e:
@@ -161,7 +160,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a video codec value, e.g., /v_codec libx264</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save video codec value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /v_codec: {e}")
             except FloodWait as e:
@@ -183,7 +182,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide an audio codec value, e.g., /a_codec aac</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save audio codec value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /a_codec: {e}")
             except FloodWait as e:
@@ -205,7 +204,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide an audio bitrate value, e.g., /audio_b 64k</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save audio bitrate value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /audio_b: {e}")
             except FloodWait as e:
@@ -231,7 +230,7 @@ if __name__ == "__main__" :
                 await message.reply_text("<blockquote>Please provide a video bitrate value, e.g., /v_bitrate 1000 (or 0 for none/auto)</blockquote>")
             except ValueError:
                 await message.reply_text("<blockquote>Video bitrate must be an integer, e.g., 1000 or 0</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save video bitrate value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /v_bitrate: {e}")
             except FloodWait as e:
@@ -257,7 +256,7 @@ if __name__ == "__main__" :
                 await message.reply_text(OUT)
             except IndexError:
                 await message.reply_text("<blockquote>Please provide a watermark value, e.g., /watermark My Text Here (or 0/none for no watermark)</blockquote>")
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not save watermark value. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /watermark: {e}")
             except FloodWait as e:
@@ -300,7 +299,7 @@ if __name__ == "__main__" :
                     f"<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>"
                 )
                 await message.reply_text(reply_text)
-            except MotorClientError as e:
+            except PyMongoError as e:
                 await message.reply_text("<blockquote>Database error: Could not retrieve settings. Please try again later.</blockquote>")
                 logger.error(f"DB Error in /settings: {e}")
             except FloodWait as e:
@@ -310,8 +309,9 @@ if __name__ == "__main__" :
                 await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
                 logger.error(f"Unexpected error in /settings: {e}")
         else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")   
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
+    
         
     @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
     async def help_message(app, message):
