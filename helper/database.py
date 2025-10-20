@@ -1,5 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from config import Config
+from bot.config import Config
 
 class Database:
     def __init__(self):
