@@ -12,6 +12,7 @@ import re
 import json
 import subprocess
 import math
+import shlex
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
