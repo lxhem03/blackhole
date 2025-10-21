@@ -89,7 +89,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
             
     # Add video bitrate if not None
     if video_bitrate is not None:
-        ffmpeg_cmd.extend([f"-b:v {video_bitrate}")])
+        ffmpeg_cmd.extend([f"-b:v {video_bitrate}"])
 
     # Add bit depth if 10-bit
     if bits == "10":
