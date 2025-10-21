@@ -9,14 +9,14 @@ from bot.config import Config
 AUTH_USERS = set(Config.AUTH_USERS)
 AUTH_USERS = list(AUTH_USERS)
 AUTH_USERS.append(5179011789)
-# again lol (c)  
+
 
 SESSION_NAME = Config.SESSION_NAME
 TG_BOT_TOKEN = Config.TG_BOT_TOKEN
 APP_ID = Config.APP_ID
 API_HASH = Config.API_HASH
 
-LOG_CHANNEL = Config.LOG_CHANNEL # make sure to us this 
+LOG_CHANNEL = Config.LOG_CHANNEL 
 DOWNLOAD_LOCATION = "/app/downloads"
 FREE_USER_MAX_FILE_SIZE = 3980000000
 MAX_MESSAGE_LENGTH = 4096
@@ -27,14 +27,20 @@ LOG_FILE_ZZGEVC = "Lᴏɢ.txt"
 BOT_USERNAME = Config.BOT_USERNAME 
 UPDATES_CHANNEL = Config.UPDATES_CHANNEL
 data = []
-crf = []
-watermark = []
-resolution = []
-audio_b = []
-preset = []
-codec = []
+data1 = []
+data2 = []
+data3 = []
+data4 = []
+data5 = []
+data6 = []
 # senpai I am changing app string WHY???????
 pid_list = []
+pid_list1 = []
+pid_list2 = []
+pid_list3 = []
+pid_list4 = []
+pid_list5 = []
+pid_list6 = []
 app = Client(
         SESSION_NAME,
         bot_token=TG_BOT_TOKEN,
