@@ -3,7 +3,7 @@ logging.basicConfig(
     level=logging.DEBUG, 
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 import asyncio, aiohttp
 import os
