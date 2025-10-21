@@ -91,7 +91,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
         "-c:a", audio_codec,
         "-b:a", audio_b,
         "-preset", preset,
-        "-x265-params", "bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1"
+        "-x265-params", "bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1:rc-lookahead=32"
     ])
             
     # Add video bitrate if not None
