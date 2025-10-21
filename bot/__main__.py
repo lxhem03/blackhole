@@ -242,6 +242,32 @@ if __name__ == "__main__" :
         else:
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
+    @app.on_message(filters.incoming & filters.command(["bits", f"bits@{BOT_USERNAME}"]))
+        async def changebits(app, message):
+            if message.from_user.id in AUTH_USERS:
+                try:
+                    bits_val = message.text.split(" ", maxsplit=1)[1]
+                    if bits_val not in ["8", "10"]:
+                        await message.reply_text("<blockquote>Bits must be either 8 or 10, e.g., /bits 10</blockquote>")
+                        return
+                    await db.set_bits(bits_val)
+                    OUT = f"<blockquote>I will be using : {bits_val}-bit video encoding</blockquote>"
+                    await message.reply_text(OUT)
+                except IndexError:
+                    await message.reply_text("<blockquote>Please provide a bits value, e.g., /bits 10</blockquote>")
+                except PyMongoError as e:
+                    await message.reply_text("<blockquote>Database error: Could not save bits value. Please try again later.</blockquote>")
+                    logger.error(f"DB Error in /bits: {e}")
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                    await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+                except Exception as e:
+                    await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                    logger.error(f"Unexpected error in /bits: {e}")
+            else:
+                await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>") 
+
+    
     @app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))
     async def changewatermark(app, message):
         if message.from_user.id in AUTH_USERS:
@@ -280,6 +306,7 @@ if __name__ == "__main__" :
                 video_codec_val = await db.get_video_codec()
                 video_bitrate_val = await db.get_video_bitrate()
                 watermark_val = await db.get_watermark()
+                bits_val = await db.get_bits()
 
                 video_bitrate_display = "Auto/None" if video_bitrate_val is None else f"{video_bitrate_val}"
                 watermark_display = "None" if watermark_val is None else f"{watermark_val}"
@@ -294,6 +321,7 @@ if __name__ == "__main__" :
                     f"<b>➥ Preset</b> : {preset_val} \n"
                     f"<b>➥ Audio Bitrate</b> : {audio_b_val} \n"
                     f"<b>➥ Video Bitrate</b> : {video_bitrate_display} \n"
+                    f"<b>➥ Bits</b> : {bits_val} bits \n"
                     f"<b>➥ Watermark</b> : {watermark_display}"
                     f"</blockquote>\n"
                     f"<b>🥇 Tʜᴇ Aʙɪʟɪᴛʏ ᴛᴏ Cʜᴀɴɢᴇ Sᴇᴛᴛɪɴɢꜱ ɪꜱ Oɴʟʏ ꜰᴏʀ Aᴅᴍɪɴ</b>"
