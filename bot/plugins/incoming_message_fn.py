@@ -39,7 +39,8 @@ os.system("wget https://telegra.ph/file/0e369e097843b0dc4b771.jpg -O thumb.jpg")
 CURRENT_PROCESSES = {}
 CHAT_FLOOD = {}
 broadcast_ids = {}
-bot = app        
+bot = app
+
 async def incoming_start_message_f(bot, update):
     """/start command"""
     
@@ -49,14 +50,14 @@ async def incoming_start_message_f(bot, update):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton('👨‍💻 Oᴡɴᴇʀ 👨‍💻', url='https://t.me/Lord_Vasudev_Krishna')
+                    InlineKeyboardButton('👨‍💻 Oᴡɴᴇʀ 👨‍💻', url='https://t.me/itsme123c')
                 ]
             ]
         ),
         reply_to_message_id=update.id,
     )
 
-async def incoming_compress_message_f(bot, update):
+async def incoming_compress_message_f(update):
     """/compress command"""
     if update.from_user.id not in AUTH_USERS:
         await update.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
