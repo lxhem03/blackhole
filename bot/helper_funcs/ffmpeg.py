@@ -3,7 +3,7 @@ logging.basicConfig(
     level=logging.DEBUG, 
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 import asyncio, aiohttp
 import os
@@ -32,7 +32,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     # Extract file name and extension
     kk = video_file.split("/")[-1]
     aa = kk.split(".")[-1]
-    out_put_file_name = os.path.join(output_directory, kk.replace(f".{aa}", ".mkv"))
+    out_put_file_name = kk.replace(f".{aa}", "[@Itsme123c].mkv")
     progress = os.path.join(output_directory, "progress.txt")
 
     # Clear progress file
@@ -51,7 +51,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
         watermark = await db.get_watermark()
         bits = await db.get_bits()
     except Exception as e:
-        LOGGER.error(f"Failed to fetch settings from database: {e}")
+        logger.error(f"Failed to fetch settings from database: {e}")
         await message.reply_text("<blockquote>Database error: Could not fetch encoding settings. Please try again later.</blockquote>")
         return None
 
@@ -63,28 +63,28 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
 
     # Download and apply watermark image if not None
     watermark_file = None
-    try:
-        if watermark is not None:
-            watermark_file = os.path.join(output_directory, "watermark.png")
+    if watermark is not None:
+        watermark_file = os.path.join(output_directory, "watermark.png")
+        try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(watermark) as resp:
                     if resp.status == 200:
                         with open(watermark_file, 'wb') as f:
                             f.write(await resp.read())
-                        # Simplified watermark filter for reliability
+                        # Add watermark input and complex filter
                         ffmpeg_cmd.extend(["-i", watermark_file])
                         ffmpeg_cmd.extend(["-filter_complex", "[1:v]scale=1000:-1[wm];[0:v][wm]overlay=x='if(between(t,5,20),(W-w)*(t-5)/5,if(between(t,845,860),(W-w)*(t-12)/6,if(between(t,1245,1260),(W-w)*(t-20)/5,NAN)))':y=10,scale=1920:1080,format=yuv420p10le"])
                     else:
-                        LOGGER.error(f"Failed to download watermark image from {watermark}: HTTP {resp.status}")
+                        logger.error(f"Failed to download watermark image from {watermark}: HTTP {resp.status}")
                         await message.reply_text("<blockquote>Error: Could not download watermark image.</blockquote>")
                         return None
-    except Exception as e:
-        LOGGER.error(f"Error downloading watermark image: {e}")
-        await message.reply_text("<blockquote>Error: Could not download watermark image.</blockquote>")
-        return None
+        except Exception as e:
+            logger.error(f"Error downloading watermark image: {e}")
+            await message.reply_text("<blockquote>Error: Could not download watermark image.</blockquote>")
+            return None
 
     ffmpeg_cmd.extend([
-        f"-c:v {video_codec}", f"-crf {crf}", f"-s {resolution}", f"-c:a {audio_codec}", f"-b:a {audio_b}", f"-preset {preset}", "-x265-params", "bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1"
+        f"-c:v {video_codec} -crf {crf} -s {resolution} -c:a {audio_codec} -b:a {audio_b} -preset {preset} -x265-params 'bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1'"
     ])
             
     # Add video bitrate if not None
@@ -95,7 +95,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     if bits == "10":
         ffmpeg_cmd.extend(["-pix_fmt yuv420p10le"])
 
-    ffmpeg_cmd.extend([f"-map 0", "-c:s copy", "-ac 2", f"-ab {audio_b}", "-vbr 2", "-level 3.1", "-threads 1"])
+    ffmpeg_cmd.extend([f"-map 0 -c:s copy -ac 2 -ab {audio_b} -vbr 2 -level 3.1 -threads 1"])
 
     # Complete FFmpeg command
     ffmpeg_cmd.extend([out_put_file_name, "-y"])
@@ -109,7 +109,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
         stderr=asyncio.subprocess.PIPE,
     )
 
-    LOGGER.info(f"ffmpeg_process: {process.pid}")
+    logger.info(f"ffmpeg_process: {process.pid}")
     pid_list.insert(0, process.pid)
     status = os.path.join(output_directory, "status.json")
     with open(status, 'r+') as f:
@@ -122,116 +122,108 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     isDone = False
     while process.returncode is None:
         await asyncio.sleep(3)
-        try:
-            with open(progress, 'r') as file:
-                text = file.read()
-                frame = re.findall("frame=(\d+)", text)
-                time_in_us = re.findall("out_time_ms=(\d+)", text)
-                progress_status = re.findall("progress=(\w+)", text)
-                speed = re.findall("speed=(\d+\.?\d*)", text)
-                frame = int(frame[-1]) if frame else 1
-                speed = float(speed[-1]) if speed else 1.0
-                time_in_us = int(time_in_us[-1]) if time_in_us else 1
-                if progress_status and progress_status[-1] == "end":
-                    LOGGER.info("FFmpeg process completed")
-                    isDone = True
-                    break
-                execution_time = TimeFormatter((time.time() - COMPRESSION_START_TIME) * 1000)
-                elapsed_time = time_in_us / 1000000
-                difference = math.floor((total_time - elapsed_time) / speed)
-                ETA = "-" if difference <= 0 else TimeFormatter(difference * 1000)
-                percentage = math.floor(elapsed_time * 100 / total_time)
-                progress_str = "♻️<b>ᴘʀᴏɢʀᴇss:</b> {0}%\n[{1}{2}]".format(
-                    round(percentage, 2),
-                    ''.join([FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 10))]),
-                    ''.join([UN_FINISHED_PROGRESS_STR for i in range(10 - math.floor(percentage / 10))])
-                )
-                stats = (
-                    f'<p>⚡ <b>ᴇɴᴄᴏᴅɪɴɢ ɪɴ ᴘʀᴏɢʀᴇss</b></p>\n\n'
-                    f'🕛 <b>ᴛɪᴍᴇ ʟᴇғᴛ:</b> {ETA}\n\n'
-                    f'{progress_str}\n'
-                )
-                try:
-                    await message.edit_text(
-                        text=stats,
-                        reply_markup=InlineKeyboardMarkup(
-                            [[InlineKeyboardButton('❌ Cancel ❌', callback_data='fuckingdo')]]
-                        )
+        with open(progress, 'r+') as file:
+            text = file.read()
+            frame = re.findall("frame=(\d+)", text)
+            time_in_us = re.findall("out_time_ms=(\d+)", text)
+            progress_status = re.findall("progress=(\w+)", text)
+            speed = re.findall("speed=(\d+\.?\d*)", text)
+            if frame:
+                frame = int(frame[-1])
+            else:
+                frame = 1
+            if speed:
+                speed = speed[-1]
+            else:
+                speed = 1
+            if time_in_us:
+                time_in_us = time_in_us[-1]
+            else:
+                time_in_us = 1
+            if progress_status and progress_status[-1] == "end":
+                logger.info("FFmpeg process completed")
+                isDone = True
+                break
+            execution_time = TimeFormatter((time.time() - COMPRESSION_START_TIME) * 1000)
+            elapsed_time = int(time_in_us) / 1000000
+            difference = math.floor((total_time - elapsed_time) / float(speed))
+            ETA = "-" if difference <= 0 else TimeFormatter(difference * 1000)
+            percentage = math.floor(elapsed_time * 100 / total_time)
+            progress_str = "♻️<b>ᴘʀᴏɢʀᴇss:</b> {0}%\n[{1}{2}]".format(
+                round(percentage, 2),
+                ''.join([FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 10))]),
+                ''.join([UN_FINISHED_PROGRESS_STR for i in range(10 - math.floor(percentage / 10))])
+            )
+            stats = (
+                f'<p>⚡ <b>ᴇɴᴄᴏᴅɪɴɢ ɪɴ ᴘʀᴏɢʀᴇss</b></p>\n\n'
+                f'🕛 <b>ᴛɪᴍᴇ ʟᴇғᴛ:</b> {ETA}\n\n'
+                f'{progress_str}\n'
+            )
+            try:
+                await message.edit_text(
+                    text=stats,
+                    reply_markup=InlineKeyboardMarkup(
+                        [[InlineKeyboardButton('❌ Cancel ❌', callback_data='fuckingdo')]]
                     )
-                except:
-                    pass
-                try:
-                    await chan_msg.edit_text(text=stats)
-                except:
-                    pass
-        except Exception as e:
-            LOGGER.error(f"Error reading progress file: {e}")
-            continue
+                )
+            except:
+                pass
+            try:
+                await chan_msg.edit_text(text=stats)
+            except:
+                pass
 
     stdout, stderr = await process.communicate()
     e_response = stderr.decode().strip()
     t_response = stdout.decode().strip()
-    LOGGER.info(f"FFmpeg stdout: {t_response}")
-    LOGGER.info(f"FFmpeg stderr: {e_response}")
+    logger.info(f"FFmpeg stdout: {t_response}")
+    logger.info(f"FFmpeg stderr: {e_response}")
 
     del pid_list[0]
-
-    # Check if FFmpeg process failed
-    if process.returncode != 0:
-        LOGGER.error(f"FFmpeg failed with return code {process.returncode}: {e_response}")
-        await message.reply_text(f"<blockquote>Error: Encoding failed. FFmpeg error: {e_response}</blockquote>")
-        return None
 
     # Clean up watermark file if used
     if watermark_file and os.path.exists(watermark_file):
         try:
             os.remove(watermark_file)
         except Exception as e:
-            LOGGER.error(f"Failed to delete watermark file: {e}")
+            logger.error(f"Failed to delete watermark file: {e}")
 
     if os.path.exists(out_put_file_name):
         return out_put_file_name
     else:
-        LOGGER.error("FFmpeg output file not created")
+        logger.error("FFmpeg output file not created")
         await message.reply_text("<blockquote>Error: Encoding failed. No output file created.</blockquote>")
         return None
 
 async def media_info(saved_file_path):
-    try:
-        process = subprocess.Popen(
-            [
-                'ffmpeg', 
-                "-hide_banner", 
-                '-i', 
-                saved_file_path
-            ], 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.STDOUT
-        )
-        stdout, stderr = process.communicate()
-        if process.returncode != 0:
-            LOGGER.error(f"FFmpeg media_info failed: {stdout.decode().strip()}")
-            return None, None
-        output = stdout.decode().strip()
-        duration = re.search("Duration:\s*(\d*):(\d*):(\d+\.?\d*)[\s\w*$]", output)
-        bitrates = re.search("bitrate:\s*(\d+)[\s\w*$]", output)
-        
-        if duration is not None:
-            hours = int(duration.group(1))
-            minutes = int(duration.group(2))
-            seconds = math.floor(float(duration.group(3)))
-            total_seconds = (hours * 60 * 60) + (minutes * 60) + seconds
-        else:
-            total_seconds = None
-        if bitrates is not None:
-            bitrate = bitrates.group(1)
-        else:
-            bitrate = None
-        return total_seconds, bitrate
-    except Exception as e:
-        LOGGER.error(f"Error in media_info: {e}")
-        return None, None
-
+  process = subprocess.Popen(
+    [
+      'ffmpeg', 
+      "-hide_banner", 
+      '-i', 
+      saved_file_path
+    ], 
+    stdout=subprocess.PIPE, 
+    stderr=subprocess.STDOUT
+  )
+  stdout, stderr = process.communicate()
+  output = stdout.decode().strip()
+  duration = re.search("Duration:\s*(\d*):(\d*):(\d+\.?\d*)[\s\w*$]",output)
+  bitrates = re.search("bitrate:\s*(\d+)[\s\w*$]",output)
+  
+  if duration is not None:
+    hours = int(duration.group(1))
+    minutes = int(duration.group(2))
+    seconds = math.floor(float(duration.group(3)))
+    total_seconds = ( hours * 60 * 60 ) + ( minutes * 60 ) + seconds
+  else:
+    total_seconds = None
+  if bitrates is not None:
+    bitrate = bitrates.group(1)
+  else:
+    bitrate = None
+  return total_seconds, bitrate
+  
 async def take_screen_shot(video_file, output_directory, ttl):
     out_put_file_name = os.path.join(
         output_directory,
@@ -251,28 +243,23 @@ async def take_screen_shot(video_file, output_directory, ttl):
         
         process = await asyncio.create_subprocess_exec(
             *file_genertor_command,
+            # stdout must a pipe to be accessible as process.stdout
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
+        # Wait for the subprocess to finish
         stdout, stderr = await process.communicate()
         e_response = stderr.decode().strip()
         t_response = stdout.decode().strip()
-        if process.returncode != 0:
-            LOGGER.error(f"FFmpeg screenshot failed: {e_response}")
-            return None
-    if os.path.exists(out_put_file_name):
+    #
+    if os.path.lexists(out_put_file_name):
         return out_put_file_name
     else:
         return None
-
+# senpai I edited this,  maybe if it is wrong correct it 
 def get_width_height(video_file):
-    try:
-        metadata = extractMetadata(createParser(video_file))
-        if metadata and metadata.has("width") and metadata.has("height"):
-            return metadata.get("width"), metadata.get("height")
-        else:
-            LOGGER.warning(f"No width/height metadata found for {video_file}, using default")
-            return 1280, 720
-    except Exception as e:
-        LOGGER.error(f"Error extracting metadata for {video_file}: {e}")
+    metadata = extractMetadata(createParser(video_file))
+    if metadata.has("width") and metadata.has("height"):
+        return metadata.get("width"), metadata.get("height")
+    else:
         return 1280, 720
