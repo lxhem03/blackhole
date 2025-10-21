@@ -84,7 +84,13 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
             return None
 
     ffmpeg_cmd.extend([
-        f"-c:v {video_codec} -crf {crf} -s {resolution} -c:a {audio_codec} -b:a {audio_b} -preset {preset} -x265-params 'bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1'"
+        "-c:v", video_codec,
+        "-crf", str(crf),
+        "-s", resolution,
+        "-c:a", audio_codec,
+        "-b:a", audio_b,
+        "-preset", preset,
+        "-x265-params", "bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1"
     ])
             
     # Add video bitrate if not None
