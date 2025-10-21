@@ -33,7 +33,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     # Extract file name and extension
     kk = video_file.split("/")[-1]
     aa = kk.split(".")[-1]
-    out_put_file_name = kk.replace(f".{aa}", "[@Itsme123c].mkv")
+    out_put_file_name = kk.replace("[@Itsme123c]", f".{aa}")
     progress = os.path.join(output_directory, "progress.txt")
 
     # Clear progress file
