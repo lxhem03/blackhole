@@ -243,29 +243,29 @@ if __name__ == "__main__" :
             await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
 
     @app.on_message(filters.incoming & filters.command(["bits", f"bits@{BOT_USERNAME}"]))
-        async def changebits(app, message):
-            if message.from_user.id in AUTH_USERS:
-                try:
-                    bits_val = message.text.split(" ", maxsplit=1)[1]
-                    if bits_val not in ["8", "10"]:
-                        await message.reply_text("<blockquote>Bits must be either 8 or 10, e.g., /bits 10</blockquote>")
-                        return
-                    await db.set_bits(bits_val)
-                    OUT = f"<blockquote>I will be using : {bits_val}-bit video encoding</blockquote>"
-                    await message.reply_text(OUT)
-                except IndexError:
-                    await message.reply_text("<blockquote>Please provide a bits value, e.g., /bits 10</blockquote>")
-                except PyMongoError as e:
-                    await message.reply_text("<blockquote>Database error: Could not save bits value. Please try again later.</blockquote>")
-                    logger.error(f"DB Error in /bits: {e}")
-                except FloodWait as e:
-                    await asyncio.sleep(e.value)
-                    await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
-                except Exception as e:
-                    await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
-                    logger.error(f"Unexpected error in /bits: {e}")
-            else:
-                await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>") 
+    async def changebits(app, message):
+        if message.from_user.id in AUTH_USERS:
+            try:
+                bits_val = message.text.split(" ", maxsplit=1)[1]
+                if bits_val not in ["8", "10"]:
+                    await message.reply_text("<blockquote>Bits must be either 8 or 10, e.g., /bits 10</blockquote>")
+                    return
+                await db.set_bits(bits_val)
+                OUT = f"<blockquote>I will be using : {bits_val}-bit video encoding</blockquote>"
+                await message.reply_text(OUT)
+            except IndexError:
+                await message.reply_text("<blockquote>Please provide a bits value, e.g., /bits 10</blockquote>")
+            except PyMongoError as e:
+                await message.reply_text("<blockquote>Database error: Could not save bits value. Please try again later.</blockquote>")
+                logger.error(f"DB Error in /bits: {e}")
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text("<blockquote>Rate limit hit, please try again shortly.</blockquote>")
+            except Exception as e:
+                await message.reply_text("<blockquote>An unexpected error occurred. Please try again.</blockquote>")
+                logger.error(f"Unexpected error in /bits: {e}")
+        else:
+            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>") 
 
     
     @app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))
