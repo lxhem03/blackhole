@@ -96,12 +96,12 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
             
     # Add video bitrate if not None
     if video_bitrate is not None:
-        ffmpeg_cmd.extend([f"-b:v {video_bitrate}"])
+        ffmpeg_cmd.extend(["-b:v", video_bitrate])
 
     # Add bit depth if 10-bit
     if bits == "10":
-        ffmpeg_cmd.extend(["-pix_fmt yuv420p10le"])
-
+        ffmpeg_cmd.extend(["-pix_fmt", "yuv420p10le"])
+        
     ffmpeg_cmd.extend([f"-map 0 -c:s copy -ac 2 -ab {audio_b} -vbr 2 -level 3.1 -threads 1"])
     logger.info(f"Input exists: {os.path.exists(video_file)}, Path: {video_file}")
     logger.info(f"Output directory exists: {os.path.exists(output_directory)}, Path: {output_directory}")
