@@ -84,19 +84,18 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
             return None
 
     ffmpeg_cmd.extend([
-        "-c:v", video_codec, "-crf", int(crf),
-        "-s", resolution, "-c:a", audio_codec, "-b:a", audio_b, "-preset", preset, "-x265-params 'bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1'"
+        f"-c:v, {video_codec} -crf {crf} -s {resolution} -c:a {audio_codec} -b:a {audio_b} -preset {preset} -x265-params 'bframes=8:psy-rd=1:ref=3:aq-mode=3:aq-strength=0.8:deblock=1,1'"
     ])
             
     # Add video bitrate if not None
     if video_bitrate is not None:
-        ffmpeg_cmd.extend(["-b:v", str(video_bitrate)])
+        ffmpeg_cmd.extend([f"-b:v {video_bitrate}")])
 
     # Add bit depth if 10-bit
     if bits == "10":
-        ffmpeg_cmd.extend(["-pix_fmt", "yuv420p10le"])
+        ffmpeg_cmd.extend(["-pix_fmt yuv420p10le"])
 
-    ffmpeg_cmd.extend(["-map", "0", "-c:s", "copy", "-ac 2 -ab", audio_b, "-vbr 2 -level 3.1 -threads 1"])
+    ffmpeg_cmd.extend([f"-map 0 -c:s copy -ac 2 -ab {audio_b} -vbr 2 -level 3.1 -threads 1"])
 
     # Complete FFmpeg command
     ffmpeg_cmd.extend([out_put_file_name, "-y"])
