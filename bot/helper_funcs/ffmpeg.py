@@ -57,7 +57,7 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
 
     # Prepare FFmpeg command components
     ffmpeg_cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "quiet", "-progress", progress,
+        "ffmpeg", "-hide_banner", "-loglevel", "error", "-progress", progress,
         "-i", video_file
     ]
 
@@ -102,10 +102,14 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
         ffmpeg_cmd.extend(["-pix_fmt yuv420p10le"])
 
     ffmpeg_cmd.extend([f"-map 0 -c:s copy -ac 2 -ab {audio_b} -vbr 2 -level 3.1 -threads 1"])
+    logger.info(f"Input exists: {os.path.exists(video_file)}, Path: {video_file}")
+    logger.info(f"Output directory exists: {os.path.exists(output_directory)}, Path: {output_directory}")
 
     # Complete FFmpeg command
     ffmpeg_cmd.extend([out_put_file_name, "-y"])
-    file_genertor_command = " ".join(f"'{x}'" if ":" in x or " " in x else x for x in ffmpeg_cmd)
+    file_genertor_command = " ".join(shlex.quote(x) for x in ffmpeg_cmd)
+
+    logger.info(f"Running FFmpeg: {file_genertor_command}")
 
     # Start FFmpeg process
     COMPRESSION_START_TIME = time.time()
