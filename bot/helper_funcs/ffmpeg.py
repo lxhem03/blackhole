@@ -102,7 +102,15 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     if bits == "10":
         ffmpeg_cmd.extend(["-pix_fmt", "yuv420p10le"])
         
-    ffmpeg_cmd.extend([f"-map 0 -c:s copy -ac 2 -ab {audio_b} -vbr 2 -level 3.1 -threads 1"])
+    ffmpeg_cmd.extend([
+        "-map", "0", 
+        "-c:s", "copy", 
+        "-ac", "2", 
+        "-ab", audio_b, 
+        "-vbr", "2", 
+        "-level", "3.1", 
+        "-threads", "1"
+    ])
     logger.info(f"Input exists: {os.path.exists(video_file)}, Path: {video_file}")
     logger.info(f"Output directory exists: {os.path.exists(output_directory)}, Path: {output_directory}")
 
