@@ -25,6 +25,7 @@ class Database:
         "audio_codec": "aac",
         "video_codec": "libx264",
         "video_bitrate": 0,
+        "bits": "8",
         "watermark": 0
     }
     
@@ -85,5 +86,13 @@ class Database:
     
     async def set_video_bitrate(self, value):
         await self.collection.replace_one({"_id": "video_bitrate"}, {"_id": "video_bitrate", "value": value}, upsert=True)
+
+    async def get_bits(self):
+        doc = await self.collection.find_one({"_id": "bits"})
+        return doc["value"] if doc else self.defaults["bits"]
+    
+    async def set_bits(self, value):
+        await self.collection.replace_one({"_id": "bits"}, {"_id": "bits", "value": value}, upsert=True)
+            
 
 db = Database()
