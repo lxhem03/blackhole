@@ -57,11 +57,8 @@ async def incoming_start_message_f(bot, update):
         reply_to_message_id=update.id,
     )
 
-async def incoming_compress_message_f(bot, update):
+async def incoming_compress_message_f(update):
     """/compress command"""
-    if update.from_user.id not in AUTH_USERS:
-        await update.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
-        return
 
     # Check if message contains video or document
     if not (update.video or update.document):
