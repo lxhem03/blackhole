@@ -188,8 +188,7 @@ async def incoming_compress_message_f(update):
 
     # Use input video's caption or default
     caption = update.caption if update.caption else "Encoded by @Itsme123c"
-    caption = Localisation.COMPRESS_SUCCESS.replace('{}', TimeFormatter(d_start * 1000), 1).replace('{}', compressed_time, 1) + f"\n{caption}"
-
+    
     try:
         upload = await bot.send_document(
             chat_id=update.chat.id,
@@ -235,12 +234,7 @@ async def incoming_compress_message_f(update):
         chat_id=LOG_CHANNEL,
         text=f"<blockquote>**𝙴𝙽𝙲𝙾𝙳𝙴𝙳 𝚄𝚙𝚕𝚘𝚊𝚍 𝙳𝚘𝚗𝚎{now}</blockquote>"
     )
-    try:
-        await upload.edit_caption(
-            caption=caption.replace('{}', uploaded_time)
-        )
-    except:
-        pass
+
 
     # Cleanup
     if os.path.exists(video):
