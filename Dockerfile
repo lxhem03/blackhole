@@ -15,21 +15,13 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
         wget \
         zstd \
         p7zip \
-        xz-utils \
         curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Download & install static FFmpeg build (AV1 + HEVC + 10-bit + filters)
-RUN curl -L -o /tmp/ffmpeg.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.0.2-latest-linux64-gpl.tar.xz && \
-    tar -xf /tmp/ffmpeg.tar.xz -C /tmp && \
-    mv /tmp/ffmpeg-n7.0.2-latest-linux64-gpl/bin/ffmpeg /usr/local/bin/ffmpeg && \
-    mv /tmp/ffmpeg-n7.0.2-latest-linux64-gpl/bin/ffprobe /usr/local/bin/ffprobe && \
-    chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe && \
-    rm -rf /tmp/*
-
-# Verify FFmpeg installation
-RUN ffmpeg -version
+# Install recent FFmpeg static build with AV1 support
+RUN wget -q https://johnvansickle.com/ffmpeg/git-ffmpeg -O /usr/local/bin/ffmpeg && \
+    chmod +x /usr/local/bin/ffmpeg
 
 # Upgrade pip and install Python dependencies
 COPY requirements.txt .
