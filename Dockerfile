@@ -15,13 +15,21 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
         wget \
         zstd \
         p7zip \
-        curl && \
+        xz-utils \
+        curl \
+        tar && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install recent FFmpeg static build with AV1 support
-RUN wget -q https://johnvansickle.com/ffmpeg/git-ffmpeg -O /usr/local/bin/ffmpeg && \
-    chmod +x /usr/local/bin/ffmpeg
+RUN cd /tmp && \
+    wget -q https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz && \
+    tar -xf ffmpeg-git-amd64-static.tar.xz && \
+    mv ffmpeg-git-*/ffmpeg /usr/local/bin/ffmpeg && \
+    mv ffmpeg-git-*/ffprobe /usr/local/bin/ffprobe && \
+    chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe && \
+    rm -rf ffmpeg-git-* && \
+    cd /app
 
 # Upgrade pip and install Python dependencies
 COPY requirements.txt .
