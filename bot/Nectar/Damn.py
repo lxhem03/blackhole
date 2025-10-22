@@ -334,83 +334,79 @@ async def settings(app, message):
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
     
         
-    @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        if message.chat.id not in AUTH_USERS:
-            return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")
-        query = await message.reply_text("Aᴅᴅᴇᴅ Tᴏ Qᴜᴇᴜᴇ ⏰...\nPʟᴇᴀꜱᴇ ʙᴇ Pᴀᴛɪᴇɴᴛ, Cᴏᴍᴘʀᴇꜱꜱ ᴡɪʟʟ Sᴛᴀʀᴛ Sᴏᴏɴ", quote=True)
-        data.append(message.reply_to_message)
-        if len(data) == 1:
-         await query.delete()   
-         await add_task(message.reply_to_message)     
+@app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    if message.chat.id not in AUTH_USERS:
+        return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")
+    query = await message.reply_text("Aᴅᴅᴇᴅ Tᴏ Qᴜᴇᴜᴇ ⏰...\nPʟᴇᴀꜱᴇ ʙᴇ Pᴀᴛɪᴇɴᴛ, Cᴏᴍᴘʀᴇꜱꜱ ᴡɪʟʟ Sᴛᴀʀᴛ Sᴏᴏɴ", quote=True)
+    data.append(message.reply_to_message)
+    if len(data) == 1:
+        await query.delete()   
+        await add_task(message.reply_to_message)     
  
-    @app.on_message(filters.incoming & filters.command(["restart", f"restart@{BOT_USERNAME}"]))
-    async def restarter(app, message):
-        if message.from_user.id in AUTH_USERS:
-            await message.reply_text("Rᴇꜱᴛᴀʀᴛɪɴɢ...♻️")
-            quit(1)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+@app.on_message(filters.incoming & filters.command(["restart", f"restart@{BOT_USERNAME}"]))
+async def restarter(app, message):
+    if message.from_user.id in AUTH_USERS:
+        await message.reply_text("Rᴇꜱᴛᴀʀᴛɪɴɢ...♻️")
+        quit(1)
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
             
-    @app.on_message(filters.incoming & filters.command(["clear", f"clear@{BOT_USERNAME}"]))
-    async def restarter(app, message):
-        data.clear()
-        if message.chat.id not in AUTH_USERS:
-            return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")
-        query = await message.reply_text("<blockquote>Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Cʟᴇᴀʀᴇᴅ Qᴜᴇᴜᴇ...📚</blockquote>")
+@app.on_message(filters.incoming & filters.command(["clear", f"clear@{BOT_USERNAME}"]))
+async def restarter(app, message):
+    data.clear()
+    if message.chat.id not in AUTH_USERS:
+        return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")
+    query = await message.reply_text("<blockquote>Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Cʟᴇᴀʀᴇᴅ Qᴜᴇᴜᴇ...📚</blockquote>")
       
         
-    @app.on_message(filters.incoming & (filters.video | filters.document))
-    async def help_message(app, message):
-        if message.chat.id not in AUTH_USERS:
-            return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")
-        query = await message.reply_text("Aᴅᴅᴇᴅ Tᴏ Qᴜᴇᴜᴇ ⏰...\nPʟᴇᴀꜱᴇ ʙᴇ Pᴀᴛɪᴇɴᴛ, Cᴏᴍᴘʀᴇꜱꜱ ᴡɪʟʟ Sᴛᴀʀᴛ Sᴏᴏɴ", quote=True)
-        data.append(message)
-        if len(data) == 1:
-         await query.delete()   
-         await add_task(message)
+@app.on_message(filters.incoming & (filters.video | filters.document))
+async def help_message(app, message):
+    if message.chat.id not in AUTH_USERS:
+        pass
+    query = await message.reply_text("Aᴅᴅᴇᴅ Tᴏ Qᴜᴇᴜᴇ ⏰...\nPʟᴇᴀꜱᴇ ʙᴇ Pᴀᴛɪᴇɴᴛ, Cᴏᴍᴘʀᴇꜱꜱ ᴡɪʟʟ Sᴛᴀʀᴛ Sᴏᴏɴ", quote=True)
+    data.append(message)
+    if len(data) == 1:
+        await query.delete()   
+        await add_task(message)
             
-    @app.on_message(filters.incoming & filters.command(["sysinfo", f"sysinfo@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        if message.from_user.id in AUTH_USERS:
-            await sysinfo(message)
-        else:
-            await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+@app.on_message(filters.incoming & filters.command(["sysinfo", f"sysinfo@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    if message.from_user.id in AUTH_USERS:
+        await sysinfo(message)
+    else:
+        await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
         
-    @app.on_message(filters.incoming & filters.command(["cancel", f"cancel@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await incoming_cancel_message_f(app, message)
+@app.on_message(filters.incoming & filters.command(["cancel", f"cancel@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await incoming_cancel_message_f(app, message)
         
-    @app.on_message(filters.incoming & filters.command(["exec", f"exec@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await exec_message_f(app, message)
+@app.on_message(filters.incoming & filters.command(["exec", f"exec@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await exec_message_f(app, message)
         
-    @app.on_message(filters.incoming & filters.command(["eval", f"eval@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await eval_message_f(app, message)
+@app.on_message(filters.incoming & filters.command(["eval", f"eval@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await eval_message_f(app, message)
         
-    @app.on_message(filters.incoming & filters.command(["stop", f"stop@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await on_task_complete()    
-   
-    @app.on_message(filters.incoming & filters.command(["help", f"help@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await message.reply_text("Hɪ, ɪ ᴀᴍ <b>Video Encoder bot</b>\n<blockquote>➥ Sᴇɴᴅ ᴍᴇ Yᴏᴜʀ Tᴇʟᴇɢʀᴀᴍ Fɪʟᴇꜱ\n➥ I ᴡɪʟʟ Eɴᴄᴏᴅᴇ ᴛʜᴇᴍ Oɴᴇ ʙʏ Oɴᴇ Aꜱ ɪ Hᴀᴠᴇ <b>Queue Feature</b>\n➥ Jᴜꜱᴛ Sᴇɴᴅ ᴍᴇ ᴛʜᴇ Jᴘɢ/Pɪᴄ ᴀɴᴅ Iᴛ Wɪʟʟ ʙᴇ Sᴇᴛ ᴀꜱ Yᴏᴜʀ Cᴜꜱᴛᴏᴍ Tʜᴜᴍʙɴᴀɪʟ \n➥ Fᴏʀ FFᴍᴘᴇɢ Lᴏᴠᴇʀꜱ - U ᴄᴀɴ Cʜᴀɴɢᴇ ᴄʀꜰ Bʏ /eval crf.insert(0, 'crf value')</blockquote> \n<b>Maintained By : @SECRECT_BOT_UPDATES", quote=True)
+@app.on_message(filters.incoming & filters.command(["stop", f"stop@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await on_task_complete()    
+    
+@app.on_message(filters.incoming & filters.command(["help", f"help@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await message.reply_text("Hɪ, ɪ ᴀᴍ <b>Video Encoder bot</b>\n<blockquote>➥ Sᴇɴᴅ ᴍᴇ Yᴏᴜʀ Tᴇʟᴇɢʀᴀᴍ Fɪʟᴇꜱ\n➥ I ᴡɪʟʟ Eɴᴄᴏᴅᴇ ᴛʜᴇᴍ Oɴᴇ ʙʏ Oɴᴇ Aꜱ ɪ Hᴀᴠᴇ <b>Queue Feature</b>\n➥ Jᴜꜱᴛ Sᴇɴᴅ ᴍᴇ ᴛʜᴇ Jᴘɢ/Pɪᴄ ᴀɴᴅ Iᴛ Wɪʟʟ ʙᴇ Sᴇᴛ ᴀꜱ Yᴏᴜʀ Cᴜꜱᴛᴏᴍ Tʜᴜᴍʙɴᴀɪʟ \n➥ Fᴏʀ FFᴍᴘᴇɢ Lᴏᴠᴇʀꜱ - U ᴄᴀɴ Cʜᴀɴɢᴇ ᴄʀꜰ Bʏ /eval crf.insert(0, 'crf value')</blockquote> \n<b>Maintained By : @SECRECT_BOT_UPDATES", quote=True)
         
-    @app.on_message(filters.incoming & filters.command(["log", f"log@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        await upload_log_file(app, message)
-    @app.on_message(filters.incoming & filters.command(["ping", f"ping@{BOT_USERNAME}"]))
-    async def up(app, message):
-      stt = dt.now()
-      ed = dt.now()
-      v = ts(int((ed - uptime).seconds) * 1000)
-      u = f"<blockquote>Bᴏᴛ ᴜᴘᴛɪᴍᴇ = {v} 🚀"
-      ms = (ed - stt).microseconds / 1000
-      p = f"Pɪɴɢ = {ms}ms 🌋</blockquote>"
-      await message.reply_text(u + "\n" + p)
-
-    call_back_button_handler = CallbackQueryHandler(
-        button
-    )
-    app.add_handler(call_back_button_handler)
+@app.on_message(filters.incoming & filters.command(["log", f"log@{BOT_USERNAME}"]))
+async def help_message(app, message):
+    await upload_log_file(app, message)
+    
+@app.on_message(filters.incoming & filters.command(["ping", f"ping@{BOT_USERNAME}"]))
+async def up(app, message):
+    stt = dt.now()
+    ed = dt.now()
+    v = ts(int((ed - uptime).seconds) * 1000)
+    u = f"<blockquote>Bᴏᴛ ᴜᴘᴛɪᴍᴇ = {v} 🚀"
+    ms = (ed - stt).microseconds / 1000
+    p = f"Pɪɴɢ = {ms}ms 🌋</blockquote>"
+    await message.reply_text(u + "\n" + p)
