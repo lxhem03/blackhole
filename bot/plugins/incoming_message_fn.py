@@ -57,10 +57,15 @@ async def incoming_start_message_f(bot, update):
         reply_to_message_id=update.id,
     )
 
-async def incoming_compress_message_f(update):
+async def incoming_compress_message_f(bot, update):
     """/compress command"""
     if update.from_user.id not in AUTH_USERS:
         await update.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ 🔒</blockquote>")
+        return
+
+    # Check if message contains video or document
+    if not (update.video or update.document):
+        await update.reply_text("<blockquote>Please send a video or document to compress.</blockquote>")
         return
 
     d_start = time.time()
@@ -83,11 +88,18 @@ async def incoming_compress_message_f(update):
         text=f"<blockquote>**𝙱𝚘𝚝 𝙱𝚎𝚌𝚘𝚖𝚎 𝙱𝚞𝚜𝚢 𝙽𝚘𝚠...⛈**{now}</blockquote>"
     )
 
-    # Download video
+    # Get file name and extension
+    file_name = update.video.file_name if update.video else update.document.file_name
+    if not file_name:
+        file_name = f"{update.id}.mkv"  # Fallback if no file name
+    extension = file_name.split('.')[-1] if '.' in file_name else 'mkv'
+    download_path = os.path.join(DOWNLOAD_LOCATION, file_name)
+
+    # Download video or document
     try:
         video = await bot.download_media(
             message=update,
-            file_name=os.path.join(DOWNLOAD_LOCATION, f"{update.id}.{update.video.file_name.split('.')[-1]}"),
+            file_name=download_path,
             progress=progress_for_pyrogram,
             progress_args=(bot, Localisation.DOWNLOAD_START, sent_message, d_start)
         )
@@ -95,7 +107,7 @@ async def incoming_compress_message_f(update):
             await sent_message.edit_text("Dᴏᴡɴʟᴏᴀᴅ Sᴛᴏᴘᴘᴇᴅ 🛑")
             await bot.send_message(
                 chat_id=LOG_CHANNEL,
-                text=f"<blockquote>**𝙵𝚒𝚕𝚎 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝚂𝚝𝚘𝚙𝚙𝚎ᴅ{now}</blockquote>"
+                text=f"<blockquote>**𝙵𝚒𝚕𝚎 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝚂𝚝𝚘𝚙𝚙𝚎𝚍{now}</blockquote>"
             )
             await download_start.delete()
             return
@@ -179,7 +191,8 @@ async def incoming_compress_message_f(update):
 
     # Use input video's caption or default
     caption = update.caption if update.caption else "Encoded by @Itsme123c"
-    
+    caption = Localisation.COMPRESS_SUCCESS.replace('{}', TimeFormatter(d_start * 1000), 1).replace('{}', compressed_time, 1) + f"\n{caption}"
+
     try:
         upload = await bot.send_document(
             chat_id=update.chat.id,
@@ -239,7 +252,6 @@ async def incoming_compress_message_f(update):
         os.remove(encoded_file)
     if os.path.exists(thumb_image_path):
         os.remove(thumb_image_path)
-
 
 async def incoming_cancel_message_f(bot, update):
   """/cancel command"""
