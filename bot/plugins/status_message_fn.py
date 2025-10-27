@@ -13,12 +13,6 @@ from bot import (
     LOG_FILE_ZZGEVC,
     MAX_MESSAGE_LENGTH,
     AUTH_USERS,
-    crf,
-    codec,
-    resolution,
-    audio_b,
-    preset,
-    watermark,
     data,
     pid_list
 )
