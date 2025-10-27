@@ -184,13 +184,6 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
 
     del pid_list[0]
 
-    # Clean up watermark file if used
-    if watermark_file and os.path.exists(watermark_file):
-        try:
-            os.remove(watermark_file)
-        except Exception as e:
-            logger.error(f"Failed to delete watermark file: {e}")
-
     if os.path.exists(out_put_file_name):
         return out_put_file_name
     else:
