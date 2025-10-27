@@ -14,6 +14,7 @@ import os, asyncio, pyrogram, psutil, platform
 from bot import app
 from bot.config import Config
 from bot.plugins.call_back_button_handler import button
+from pyrogram.handlers import CallbackQueryHandler
 
 uptime = dt.now()
 
