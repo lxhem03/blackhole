@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from datetime import datetime as dt
 import os, asyncio, pyrogram, psutil, platform
 from bot import app
-from bot.config import *
+from bot.config import Config
 from bot.plugins.call_back_button_handler import button
 
 uptime = dt.now()
@@ -34,8 +34,8 @@ def ts(milliseconds: int) -> str:
 
 if __name__ == "__main__" :
     # create download directory, if not exist
-    if not os.path.isdir(DOWNLOAD_LOCATION):
-        os.makedirs(DOWNLOAD_LOCATION)
+    if not os.path.isdir(Config.DOWNLOAD_LOCATION):
+        os.makedirs(Config.DOWNLOAD_LOCATION)
         
     call_back_button_handler = CallbackQueryHandler(
         button
