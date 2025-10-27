@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from datetime import datetime as dt
 import os, asyncio, pyrogram, psutil, platform
 from bot import app
-from bot.config import DOWNLOAD_LOCATION
+from bot.config import *
 from bot.plugins.call_back_button_handler import button
 
 uptime = dt.now()
