@@ -42,13 +42,13 @@ pid_list4 = []
 pid_list5 = []
 pid_list6 = []
 app = Client(
-        SESSION_NAME,
-        bot_token=TG_BOT_TOKEN,
-        api_id=APP_ID,
-        api_hash=API_HASH,
-        workers=2,
-        plugins=dict{"root":"bot.Nectar"}
-    )
+    SESSION_NAME,
+    bot_token=TG_BOT_TOKEN,
+    api_id=APP_ID,
+    api_hash=API_HASH,
+    workers=2,
+    plugins=dict(root="bot.Nectar")
+)
 if os.path.exists(LOG_FILE_ZZGEVC):
     with open(LOG_FILE_ZZGEVC, "r+") as f_d:
         f_d.truncate(0)
