@@ -8,8 +8,8 @@ class Config(object):
     API_HASH = get_config("API_HASH", "90a9aa4c31afa3750da5fd686c410851")
 
     # Bot Credentials 
-    TG_BOT_TOKEN = get_config("TG_BOT_TOKEN", "7567477886:AAEbL5Smfy69KUN2lX38Wp5FIZ-sggC5JSE")
-    BOT_USERNAME = get_config("BOT_USERNAME", "MarinXkitagawabot")
+    TG_BOT_TOKEN = get_config("TG_BOT_TOKEN", "7836515152:AAExfORakVKpBc5FHP7FAHbpJ9rmwecVi8Y")
+    BOT_USERNAME = get_config("BOT_USERNAME", "KingZoroXbot")
 
     # User or group id 
     AUTH_USERS = [7465574522, -4651470400]
