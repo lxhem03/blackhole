@@ -43,6 +43,36 @@ class Database:
     
     async def set_watermark(self, value):
         await self.collection.replace_one({"_id": "watermark"}, {"_id": "watermark", "value": value}, upsert=True)
+
+    # Save chat
+    async def save_chat(self, chat_id: int):
+        await self.collection.update_one(
+            {"chat_id": chat_id},
+            {"$set": {"chat_id": chat_id}},
+            upsert=True
+        )
+
+    # Remove chat
+    async def remove_chat(self, chat_id: int):
+        await self.collection.delete_one({"chat_id": chat_id})
+
+    # Modify chat ID
+    async def modify_chat(self, old_id: int, new_id: int):
+        await self.collection.update_one(
+            {"chat_id": old_id},
+            {"$set": {"chat_id": new_id}}
+        )
+
+    # Check if authorized
+    async def is_authorized(self, chat_id: int) -> bool:
+        doc = await self.collection.find_one({"chat_id": chat_id})
+        return doc is not None
+
+    # List all authorized chats
+    async def all_chats(self) -> list:
+        cursor = self.collection.find({})
+        return [doc async for doc in cursor]
+
     
     async def get_resolution(self):
         doc = await self.collection.find_one({"_id": "resolution"})
