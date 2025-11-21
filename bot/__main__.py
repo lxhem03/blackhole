@@ -65,6 +65,15 @@ def ts(milliseconds: int) -> str:
     )    
     return tmp.rstrip(", ")
 
+
+# Decorator for group-only authorization check
+def authorized_group_only(func):
+    async def wrapper(client, message):
+        if message.chat.type in ["group", "supergroup"]:
+            if not await db.is_authorized(message.chat.id):
+                return await message.reply_text("🚫 This group is not authorized.")
+        return await func(client, message)
+    return wrapper
     
 if not os.path.isdir(DOWNLOAD_LOCATION):    
     os.makedirs(DOWNLOAD_LOCATION)    
@@ -74,6 +83,48 @@ incoming_start_message_handler = MessageHandler(
     filters=filters.command(["start", f"start@{BOT_USERNAME}"])    
 )    
 app.add_handler(incoming_start_message_handler)    
+
+# /authorize command
+@app.on_message(filters.command("authorize") & filters.user(AUTH_USER))
+async def authorize_cmd(client: app, message: Message):
+    if message.chat.type == "private":
+        return await message.reply_text("❌ Use this inside the group.")
+
+    chat_id = message.chat.id
+    if await db.is_authorized(chat_id):
+        return await message.reply_text("🔔 Already authorized.")
+
+    await db.save_chat(chat_id)
+    await message.reply_text(f"✅ Group authorized: <code>{chat_id}</code>")
+
+
+# /unauthorize command
+@app.on_message(filters.command("unauthorize") & filters.user(AUTH_USER))
+async def unauthorize_cmd(client: app, message: Message):
+    if message.chat.type == "private":
+        return await message.reply_text("❌ Use this inside the group.")
+
+    chat_id = message.chat.id
+    if not await db.is_authorized(chat_id):
+        return await message.reply_text("🔔 This group is not authorized.")
+
+    await db.remove_chat(chat_id)
+    await message.reply_text(f"❎ Group unauthorized: <code>{chat_id}</code>")
+
+
+# /authlist command
+@app.on_message(filters.command("authlist") & filters.user(AUTH_USER))
+async def authlist_cmd(client: app, message: Message):
+    chats = await db.all_chats()
+
+    if not chats:
+        return await message.reply_text("📭 No authorized groups found.")
+
+    text = "<b>✅ Authorized Groups:</b>\n\n"
+    for chat in chats:
+        text += f"• <code>{chat['chat_id']}</code>\n"
+
+    await message.reply_text(text)
 
 @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))    
 async def changecrf(app, message):    
