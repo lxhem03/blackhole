@@ -1,19 +1,17 @@
-import logging    
-import os
-import asyncio
-import platform
-from datetime import datetime as dt
+import logging
+logging.getLogger("pymongo").setLevel(logging.WARNING)
+logging.getLogger("motor").setLevel(logging.WARNING)
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
+logging.getLogger("aiohttp").setLevel(logging.WARNING)
 
+import os, asyncio, platform
+from datetime import datetime as dt
 import pyrogram
 import psutil
 from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message
 from psutil import disk_usage, cpu_percent, virtual_memory, Process as psprocess
-
-# ----------------------------------------------------------------------
-# Your existing imports
-# ----------------------------------------------------------------------
 from bot import (
     APP_ID,
     API_HASH,
@@ -43,11 +41,6 @@ from helper.database import db
 from pyrogram.errors import FloodWait
 from pymongo.errors import PyMongoError
 
-# ----------------------------------------------------------------------
-# Logging setup
-# ----------------------------------------------------------------------
-logging.getLogger("pymongo").setLevel(logging.INFO)    
-logging.getLogger("motor").setLevel(logging.INFO)    
 logging.basicConfig(    
     level=logging.INFO,    
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",    
@@ -55,9 +48,6 @@ logging.basicConfig(
 )    
 logger = logging.getLogger(__name__)    
 
-# ----------------------------------------------------------------------
-# Global vars
-# ----------------------------------------------------------------------
 sudo_users = "7660990923"          # <-- sudo user ID
 uptime = dt.now()
 
@@ -75,24 +65,16 @@ def ts(milliseconds: int) -> str:
     )    
     return tmp.rstrip(", ")
 
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-#  ALL YOUR HANDLERS (unchanged)
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-
-# create download directory, if not exist    
+    
 if not os.path.isdir(DOWNLOAD_LOCATION):    
     os.makedirs(DOWNLOAD_LOCATION)    
-
-# START command    
+    
 incoming_start_message_handler = MessageHandler(    
     incoming_start_message_f,    
     filters=filters.command(["start", f"start@{BOT_USERNAME}"])    
 )    
 app.add_handler(incoming_start_message_handler)    
 
-# ------------------- CRF -------------------
 @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))    
 async def changecrf(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -118,7 +100,6 @@ async def changecrf(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- RESOLUTION -------------------
 @app.on_message(filters.incoming & filters.command(["resolution", f"resolution@{BOT_USERNAME}"]))    
 async def changer(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -141,7 +122,6 @@ async def changer(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- PRESET -------------------
 @app.on_message(filters.incoming & filters.command(["preset", f"preset@{BOT_USERNAME}"]))    
 async def changepr(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -164,7 +144,6 @@ async def changepr(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- V_CODEC -------------------
 @app.on_message(filters.incoming & filters.command(["v_codec", f"v_codec@{BOT_USERNAME}"]))    
 async def changevcodec(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -187,7 +166,6 @@ async def changevcodec(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- A_CODEC -------------------
 @app.on_message(filters.incoming & filters.command(["a_codec", f"a_codec@{BOT_USERNAME}"]))    
 async def changeacodec(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -210,7 +188,6 @@ async def changeacodec(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- AUDIO_B -------------------
 @app.on_message(filters.incoming & filters.command(["audio_b", f"audio_b@{BOT_USERNAME}"]))    
 async def changeab(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -233,7 +210,6 @@ async def changeab(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- V_BITRATE -------------------
 @app.on_message(filters.incoming & filters.command(["v_bitrate", f"v_bitrate@{BOT_USERNAME}"]))    
 async def changevbitrate(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -260,7 +236,6 @@ async def changevbitrate(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- BITS -------------------
 @app.on_message(filters.incoming & filters.command(["bits", f"bits@{BOT_USERNAME}"]))    
 async def changebits(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -286,7 +261,6 @@ async def changebits(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")     
 
-# ------------------- WATERMARK -------------------
 @app.on_message(filters.incoming & filters.command(["watermark", f"watermark@{BOT_USERNAME}"]))    
 async def changewatermark(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -313,7 +287,6 @@ async def changewatermark(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- SETTINGS -------------------
 @app.on_message(filters.incoming & filters.command(["settings", f"settings@{BOT_USERNAME}"]))    
 async def settings(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -357,7 +330,6 @@ async def settings(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- COMPRESS -------------------
 @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     if message.chat.id not in AUTH_USERS:    
@@ -368,7 +340,6 @@ async def help_message(app, message):
         await query.delete()       
         await add_task(message.reply_to_message)         
 
-# ------------------- RESTART -------------------
 @app.on_message(filters.incoming & filters.command(["restart", f"restart@{BOT_USERNAME}"]))    
 async def restarter(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -377,7 +348,6 @@ async def restarter(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- CLEAR -------------------
 @app.on_message(filters.incoming & filters.command(["clear", f"clear@{BOT_USERNAME}"]))    
 async def restarter(app, message):    
     data.clear()    
@@ -385,7 +355,6 @@ async def restarter(app, message):
         return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")    
     await message.reply_text("<blockquote>Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Cʟᴇᴀʀᴇᴅ Qᴜᴇᴜᴇ...</blockquote>")    
 
-# ------------------- VIDEO / DOCUMENT -------------------
 @app.on_message(filters.incoming & (filters.video | filters.document))    
 async def help_message(app, message):    
     if message.chat.id not in AUTH_USERS:    
@@ -396,7 +365,6 @@ async def help_message(app, message):
         await query.delete()       
         await add_task(message)    
 
-# ------------------- SYSINFO -------------------
 @app.on_message(filters.incoming & filters.command(["sysinfo", f"sysinfo@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     if message.from_user.id in AUTH_USERS:    
@@ -404,27 +372,22 @@ async def help_message(app, message):
     else:    
         await message.reply_text("<blockquote>Aᴅᴍɪɴ Oɴʟʏ</blockquote>")    
 
-# ------------------- CANCEL -------------------
 @app.on_message(filters.incoming & filters.command(["cancel", f"cancel@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await incoming_cancel_message_f(app, message)    
 
-# ------------------- EXEC -------------------
 @app.on_message(filters.incoming & filters.command(["exec", f"exec@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await exec_message_f(app, message)    
 
-# ------------------- EVAL -------------------
 @app.on_message(filters.incoming & filters.command(["eval", f"eval@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await eval_message_f(app, message)    
 
-# ------------------- STOP -------------------
 @app.on_message(filters.incoming & filters.command(["stop", f"stop@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await on_task_complete()        
 
-# ------------------- HELP -------------------
 @app.on_message(filters.incoming & filters.command(["help", f"help@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await message.reply_text(
@@ -436,13 +399,11 @@ async def help_message(app, message):
         "<b>Maintained By : @SECRECT_BOT_UPDATES</b>",
         quote=True
     )    
-
-# ------------------- LOG -------------------
+    
 @app.on_message(filters.incoming & filters.command(["log", f"log@{BOT_USERNAME}"]))    
 async def help_message(app, message):    
     await upload_log_file(app, message)    
 
-# ------------------- PING -------------------
 @app.on_message(filters.incoming & filters.command(["ping", f"ping@{BOT_USERNAME}"]))    
 async def up(app, message):    
     stt = dt.now()    
@@ -453,16 +414,10 @@ async def up(app, message):
     p = f"Pɪɴɢ = {ms}ms "    
     await message.reply_text(u + "\n" + p)    
 
-# ----------------------------------------------------------------------
-# Callback button handler
-# ----------------------------------------------------------------------
 call_back_button_handler = CallbackQueryHandler(button)    
 app.add_handler(call_back_button_handler)    
 
-# ----------------------------------------------------------------------
-# ------------------- STARTUP MESSAGE TO SUDO -------------------
-# ----------------------------------------------------------------------
-SUDO_ID = 7465574522   # keep as int
+SUDO_ID = 7465574522
 
 async def send_startup_message():
     try:
@@ -483,20 +438,13 @@ async def send_startup_message():
     except Exception as e:
         logger.error(f"Could not send startup message: {e}")
 
-# ----------------------------------------------------------------------
-# ------------------- MAIN ENTRY POINT -------------------------
-# ----------------------------------------------------------------------
 async def main():
     await app.start()
-    await send_startup_message()          # <-- sends the restart notice
+    await send_startup_message()   
     me = await app.get_me()
     logger.info(f"Bot started as @{me.username}")
-    await pyrogram.idle()                 # keeps the bot alive
+    await pyrogram.idle()                 
     await app.stop()
 
-# ----------------------------------------------------------------------
-# Run
-# ----------------------------------------------------------------------
 if __name__ == "__main__":
-    # (download folder already created at the top of the file)
     app.loop.run_until_complete(main())
