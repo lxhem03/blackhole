@@ -407,6 +407,7 @@ async def restarter(app, message):
     await message.reply_text("<blockquote>Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Cʟᴇᴀʀᴇᴅ Qᴜᴇᴜᴇ...</blockquote>")    
 
 @app.on_message(filters.incoming & (filters.video | filters.document))    
+@authorized_group_only
 async def help_message(app, message):    
     if message.chat.id not in AUTH_USERS:    
         return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")    
