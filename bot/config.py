@@ -12,7 +12,9 @@ class Config(object):
     BOT_USERNAME = get_config("BOT_USERNAME", "MarinXkitagawabot")
 
     # User or group id 
-    AUTH_USERS = [7465574522, -4651470400]
+    OWNER = get_config("OWNER", "7465574522")
+    ADMINS = get_config("ADMINS", "7465574522") 
+    AUTH_USERS = get_config("AUTH_USERS", "7465574522")
 
     #Channels
     LOG_CHANNEL = get_config("LOG_CHANNEL", "itsme123c")
@@ -31,6 +33,7 @@ class Config(object):
     MAX_FILE_SIZE = 4194304000
     TG_MAX_FILE_SIZE = 4194304000
     FREE_USER_MAX_FILE_SIZE = 4194304000
+    UPDATE_INTERVAL = 7
     
     # default thumbnail to be used in the videos
     DEF_THUMB_NAIL_VID_S = get_config("DEF_THUMB_NAIL_VID_S", "https://envs.sh/CQU.jpg")
