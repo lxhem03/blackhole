@@ -66,14 +66,23 @@ def ts(milliseconds: int) -> str:
     return tmp.rstrip(", ")
 
 
-# Decorator for group-only authorization check
-def authorized_group_only(func):
-    async def wrapper(client, message):
-        if message.chat.type in ["group", "supergroup"]:
-            if not await db.is_authorized(message.chat.id):
-                return await message.reply_text("🚫 This group is not authorized.")
-        return await func(client, message)
-    return wrapper
+async def is_allowed(chat_id: int, user_id: int = None) -> bool:
+    """
+    Returns True if the chat/user is allowed to use the bot.
+    
+    Rules:
+    - If user_id is in AUTH_USERS → Always allowed
+    - If chat_id is a group and exists in DB → Allowed
+    - Private chats: only AUTH_USERS allowed
+    """
+
+    if user_id and user_id in AUTH_USERS:
+        return True
+
+    if chat_id < 0: 
+        return await db.is_authorized(chat_id)
+
+    return False
     
 if not os.path.isdir(DOWNLOAD_LOCATION):    
     os.makedirs(DOWNLOAD_LOCATION)    
@@ -412,10 +421,11 @@ async def restarter(app, message):
     await message.reply_text("<blockquote>Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Cʟᴇᴀʀᴇᴅ Qᴜᴇᴜᴇ...</blockquote>")    
 
 @app.on_message(filters.incoming & (filters.video | filters.document))    
-@authorized_group_only
 async def help_message(app, message):    
-    if message.chat.id not in AUTH_USERS:    
-        return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ Cᴏɴᴛᴀᴄᴛ @Lord_Vasudev_Krishna</blockquote>")    
+    chat_id = message.chat.id
+    user_id = message.from_user.id if message.from_user else None   
+    if not await is_allowed(chat_id, user_id):
+        return await message.reply_text("<blockquote>Yᴏᴜ Aʀᴇ Nᴏᴛ Aᴜᴛʜᴏʀɪꜱᴇᴅ Tᴏ Uꜱᴇ Tʜɪꜱ Bᴏᴛ</blockquote>")    
     query = await message.reply_text("Aᴅᴅᴇᴅ Tᴏ Qᴜᴇᴜᴇ...\nPʟᴇᴀꜱᴇ ʙᴇ Pᴀᴛɪᴇɴᴛ, Cᴏᴍᴘʀᴇꜱꜱ ᴡɪʟʟ Sᴛᴀʀᴛ Sᴏᴏɴ", quote=True)    
     data.append(message)    
     if len(data) == 1:    
