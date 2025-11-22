@@ -70,8 +70,8 @@ class Database:
 
     # List all authorized chats
     async def all_chats(self) -> list:
-        cursor = self.collection.find({})
-        return [doc async for doc in cursor]
+        cursor = self.collection.find({"chat_id": {"$exists": True}})
+        return [doc["chat_id"] async for doc in cursor]  # Only return the ID, not full doc
 
     
     async def get_resolution(self):
