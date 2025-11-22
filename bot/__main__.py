@@ -85,7 +85,7 @@ incoming_start_message_handler = MessageHandler(
 app.add_handler(incoming_start_message_handler)    
 
 # /authorize command
-@app.on_message(filters.command("authorize") & filters.user(AUTH_USER))
+@app.on_message(filters.command("authorize") & filters.user(AUTH_USERS))
 async def authorize_cmd(client: app, message: Message):
     if message.chat.type == "private":
         return await message.reply_text("❌ Use this inside the group.")
@@ -99,7 +99,7 @@ async def authorize_cmd(client: app, message: Message):
 
 
 # /unauthorize command
-@app.on_message(filters.command("unauthorize") & filters.user(AUTH_USER))
+@app.on_message(filters.command("unauthorize") & filters.user(AUTH_USERS))
 async def unauthorize_cmd(client: app, message: Message):
     if message.chat.type == "private":
         return await message.reply_text("❌ Use this inside the group.")
@@ -113,7 +113,7 @@ async def unauthorize_cmd(client: app, message: Message):
 
 
 # /authlist command
-@app.on_message(filters.command("authlist") & filters.user(AUTH_USER))
+@app.on_message(filters.command("authlist") & filters.user(AUTH_USERS))
 async def authlist_cmd(client: app, message: Message):
     chats = await db.all_chats()
 
