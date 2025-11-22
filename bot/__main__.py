@@ -115,16 +115,21 @@ async def unauthorize_cmd(client: app, message: Message):
 # /authlist command
 @app.on_message(filters.command("authlist") & filters.user(AUTH_USERS))
 async def authlist_cmd(client: app, message: Message):
-    chats = await db.all_chats()
+    chat_ids = await db.all_chats()  # Now returns clean list of integers
 
-    if not chats:
-        return await message.reply_text("📭 No authorized groups found.")
+    if not chat_ids:
+        return await message.reply_text("No authorized groups found.")
 
-    text = "<b>✅ Authorized Groups:</b>\n\n"
-    for chat in chats:
-        text += f"• <code>{chat['chat_id']}</code>\n"
+    text = "<b>Authorized Groups:</b>\n\n"
+    for i, chat_id in enumerate(chat_ids, 1):
+        try:
+            chat = await client.get_chat(chat_id)
+            title = chat.title or "Unknown Group"
+            text += f"{i}. <b>{title}</b>\n   ├ ID: <code>{chat_id}</code>\n   └ Type: {chat.type}\n\n"
+        except:
+            text += f"{i}. <s>Deleted/Blocked Group</s>\n   └ ID: <code>{chat_id}</code>\n\n"
 
-    await message.reply_text(text)
+    await message.reply_text(text, disable_web_page_preview=True)
 
 @app.on_message(filters.incoming & filters.command(["crf", f"crf@{BOT_USERNAME}"]))    
 async def changecrf(app, message):    
