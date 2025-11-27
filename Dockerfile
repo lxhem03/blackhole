@@ -15,8 +15,7 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
         curl \
         tar \
         xz-utils \
-        p7zip-full \           # For .7z extraction
-        && \
+        p7zip-full && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
