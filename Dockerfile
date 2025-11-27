@@ -19,15 +19,13 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Download & install LATEST Gyan full FFmpeg build (with drawtext + all filters/codecs)
+# Install FULL FFmpeg from BtbN (includes drawtext)
 RUN cd /tmp && \
-    wget -q https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-2025-11-24-git-c732564d2e-full_build.7z && \
-    7z x ffmpeg-2025-11-24-git-c732564d2e-full_build.7z && \
-    mv ffmpeg-2025-11-24-git-c732564d2e-full_build/ffmpeg /usr/local/bin/ffmpeg && \
-    mv ffmpeg-2025-11-24-git-c732564d2e-full_build/ffprobe /usr/local/bin/ffprobe && \
+    wget -q https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-linux64-gpl.tar.xz && \
+    tar -xf ffmpeg-master-latest-linux64-gpl.tar.xz && \
+    mv ffmpeg-master-latest-linux64-gpl/bin/* /usr/local/bin/ && \
     chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe && \
-    rm -rf ffmpeg-2025-11-24-git-c732564d2e-full_build* && \
-    cd /app
+    rm -rf ffmpeg-master-latest-linux64-gpl*
 
 # Fonts for drawtext (DejaVu via apt — simple)
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends \
