@@ -8,7 +8,7 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
     echo "deb http://archive.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list && \
     apt-get -qq update && \
     apt-get -qq install -y --no-install-recommends \
-        git python3 python3-pip xz-utils fontconfig wget curl tar && \
+        git python3 python3-pip xz-utils bzip2 fontconfig wget curl tar && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN cd /tmp && \
