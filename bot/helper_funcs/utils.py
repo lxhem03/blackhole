@@ -49,101 +49,110 @@ def human(n: int) -> str:
 
 
 async def sysinfo(e):
-    # 1. CPU – first call returns 0.0, so we call it once and discard
-    psutil.cpu_percent(interval=None)         
-    cpu_usage = psutil.cpu_percent(interval=1) 
+    # Warm up CPU percent
+    psutil.cpu_percent(interval=None)
+    cpu_usage = psutil.cpu_percent(interval=1)
 
-    # 2. CPU frequency
+    # CPU frequency & cores
     freq = psutil.cpu_freq()
-    freq_current = (
-        f"{round(freq.current / 1000, 2)} GHz"
-        if freq else "N/A"
-    )
+    freq_current = f"{round(freq.current / 1000, 2)} GHz" if freq else "N/A"
+    cpu_physical = psutil.cpu_count(logical=False) or "N/A"
+    cpu_logical  = psutil.cpu_count(logical=True)  or "N/A"
 
-    # 3. Core counts
-    cpu_physical = psutil.cpu_count(logical=False) or "E"
-    cpu_logical  = psutil.cpu_count(logical=True)  or "E"
-
-    # 4. RAM
+    # RAM (psutil)
     ram = psutil.virtual_memory()
 
-    # 5. Disk – root filesystem
+    # Disk
     disk = psutil.disk_usage('/')
 
-    # 6. Network I/O
+    # Network
     net = psutil.net_io_counters()
     ul_size = net.bytes_sent
     dl_size = net.bytes_recv
 
-    # Additional features
+    # === NEW: Real CPU flags from /proc/cpuinfo ===
+    try:
+        cpu_flags_raw = subprocess.check_output(
+            "cat /proc/cpuinfo | grep -i '^flags' | head -n1 | cut -d: -f2", 
+            shell=True, text=True
+        ).strip()
+        cpu_flags = cpu_flags_raw[:120] + ("..." if len(cpu_flags_raw) > 120 else "")
+    except:
+        cpu_flags = "Unable to read /proc/cpuinfo"
+
+    # === NEW: Container/Docker RAM limit from cgroup ===
+    try:
+        cgroup_limit_raw = subprocess.check_output(
+            "cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null || echo 'No limit'",
+            shell=True, text=True
+        ).strip()
+        cgroup_limit = int(cgroup_limit_raw)
+        if cgroup_limit > 10**12:  # Insanely high = no real limit (host RAM)
+            cgroup_ram = "Unlimited (Host RAM)"
+        else:
+            cgroup_ram = f"{human(cgroup_limit)}B (Container Limit)"
+    except:
+        cgroup_ram = "Not in cgroup / inaccessible"
+
     # Python version
     python_version = platform.python_version()
 
     # FFmpeg version
     try:
-        ffmpeg_output = subprocess.check_output(['ffmpeg', '-version']).decode('utf-8')
-        ffmpeg_version = ffmpeg_output.split('\n')[0].strip()  # e.g., "ffmpeg version X.Y.Z"
-    except Exception:
-        ffmpeg_version = "FFmpeg not installed or not found"
+        ffmpeg_out = subprocess.check_output(['ffmpeg', '-version'], stderr=subprocess.STDOUT)
+        ffmpeg_version = ffmpeg_out.decode().split('\n')[0].strip()
+    except:
+        ffmpeg_version = "FFmpeg not found"
 
-    # Additional FFmpeg-related checks
-    # Check for key encoders (e.g., libx264 for H.264, libx265 for H.265)
+    # Key encoders
     try:
-        encoders_output = subprocess.check_output(['ffmpeg', '-encoders']).decode('utf-8')
-        has_libx264 = "libx264" in encoders_output
-        has_libx265 = "libx265" in encoders_output
-        encoders_info = f"libx264: {'Available' if has_libx264 else 'Missing'}, libx265: {'Available' if has_libx265 else 'Missing'}"
-    except Exception:
-        encoders_info = "Unable to check encoders"
+        encoders = subprocess.check_output(['ffmpeg', '-encoders'], stderr=subprocess.DEVNULL).decode()
+        libx264 = "Yes" if "libx264" in encoders else "No"
+        libx265 = "Yes" if "libx265" in encoders else "No"
+        libsvtav1 = "Yes" if "libsvtav1" in encoders else "No"
+        encoders_info = f"x264: {libx264} | x265: {libx265} | SVT-AV1: {libsvtav1}"
+    except:
+        encoders_info = "Failed to check"
 
-    # Check for hardware acceleration (e.g., NVENC for NVIDIA)
+    # Hardware acceleration
     try:
-        hwaccel_output = subprocess.check_output(['ffmpeg', '-hwaccels']).decode('utf-8')
-        has_nvenc = "nvenc" in hwaccel_output.lower()
-        has_vaapi = "vaapi" in hwaccel_output.lower()
-        has_videotoolbox = "videotoolbox" in hwaccel_output.lower()
-        hwaccel_info = f"NVENC: {'Available' if has_nvenc else 'No'}, VAAPI: {'Available' if has_vaapi else 'No'}, VideoToolbox: {'Available' if has_videotoolbox else 'No'}"
-    except Exception:
-        hwaccel_info = "Unable to check hardware acceleration"
+        hwaccels = subprocess.check_output(['ffmpeg', '-hwaccels'], stderr=subprocess.DEVNULL).decode().lower()
+        hwaccel_info = f"NVENC: {'Yes' if 'nvenc' in hwaccels else 'No'} | VAAPI: {'Yes' if 'vaapi' in hwaccels else 'No'} | VideoToolbox: {'Yes' if 'videotoolbox' in hwaccels else 'No'}"
+    except:
+        hwaccel_info = "Failed to check"
 
-    # Hosting server speed (download speed test using a 10MB file)
+    # Download speed test (10MB)
     try:
         url = 'http://speedtest.tele2.net/10MB.zip'
-        expected_size_mb = 10.0
-        start_time = time.perf_counter()
-        with urlopen(url) as response:
-            data = response.read()
-        end_time = time.perf_counter()
-        duration = end_time - start_time
-        download_speed_mbps = (expected_size_mb * 8) / duration  # Convert MB/s to Mbps (megabits per second)
-        download_speed = f"{round(download_speed_mbps, 2)} Mbps"
-    except Exception:
-        download_speed = "Unable to measure download speed"
+        start = time.perf_counter()
+        with urlopen(url, timeout=10) as r:
+            r.read()
+        duration = time.perf_counter() - start
+        speed_mbps = round((10 * 8) / duration, 2)
+        download_speed = f"{speed_mbps} Mbps"
+    except:
+        download_speed = "Test failed"
 
     text = (
-        "<u><b>Sʏꜱᴛᴇᴍ Sᴛᴀᴛꜱ</b></u>\n"
-        "<blockquote>"
+        "<u><b>🔧 Sʏꜱᴛᴇᴍ & Sᴇʀᴠᴇʀ Iɴғᴏ</b></u>\n"
+        "<blockquote expandable>"
+        f"<b>CPU Usage:</b> <i>{cpu_usage}%</i> | <b>RAM Usage:</b> <i>{ram.percent}%</i> | <b>Disk:</b> <i>{disk.percent}%</i>\n\n"
+
+        f"<b>CPU Model Flags:</b>\n<code>{cpu_flags}</code>\n\n"
         f"<b>CPU Freq:</b> <i>{freq_current}</i>\n"
-        f"<b>CPU Cores [ Physical:</b> <i>{cpu_physical}</i> | <b>Total:</b> <i>{cpu_logical}</i> ]\n\n"
+        f"<b>Cores:</b> Physical: <i>{cpu_physical}</i> | Logical: <i>{cpu_logical}</i>\n\n"
 
-        f"<b>Total Disk :</b> <i>{human(disk.total)}B</i>\n"
-        f"<b>Used:</b> <i>{human(disk.used)}B</i> | <b>Free:</b> <i>{human(disk.free)}B</i>\n\n"
+        f"<b>RAM (psutil):</b> {human(ram.total)}B total → {human(ram.available)}B free\n"
+        f"<b>Container RAM Limit:</b> <i>{cgroup_ram}</i>\n\n"
 
-        f"<b>Total Upload:</b> <i>{human(ul_size)}B</i>\n"
-        f"<b>Total Download:</b> <i>{human(dl_size)}B</i>\n\n"
+        f"<b>Disk (/):</b> {human(disk.total)}B → {human(disk.free)}B free\n"
+        f"<b>Network ↓↑:</b> {human(dl_size)}B | {human(ul_size)}B\n\n"
 
-        f"<b>Total Ram :</b> {human(ram.total)}B\n"
-        f"<b>Used:</b> <i>{human(ram.used)}B</i> | <b>Free:</b> <i>{human(ram.available)}B</i>\n\n"
-
-        f"<b>CPU:</b> <i>{cpu_usage}%</i>\n"
-        f"<b>RAM:</b> <i>{int(ram.percent)}%</i>\n"
-        f"<b>DISK:</b> <i>{int(disk.percent)}%</i>\n\n"
-
-        f"<b>Python Version:</b> <i>{python_version}</i>\n"
-        f"<b>FFmpeg Version:</b> <i>{ffmpeg_version}</i>\n"
-        f"<b>Key Encoders:</b> <i>{encoders_info}</i>\n"
-        f"<b>Hardware Acceleration:</b> <i>{hwaccel_info}</i>\n"
-        f"<b>Download Speed:</b> <i>{download_speed}</i>"
+        f"<b>Python:</b> <i>{python_version}</i>\n"
+        f"<b>FFmpeg:</b> <i>{ffmpeg_version}</i>\n"
+        f"<b>Encoders:</b> <i>{encoders_info}</i>\n"
+        f"<b>HW Accel:</b> <i>{hwaccel_info}</i>\n"
+        f"<b>Internet Speed (10MB):</b> <i>{download_speed}</i>"
         "</blockquote>"
     )
 
