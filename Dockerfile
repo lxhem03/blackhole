@@ -1,25 +1,40 @@
-FROM debian:bookworm-slim
+FROM ubuntu:22.04
 
-WORKDIR /app
+ENV DEBIAN_FRONTEND=noninteractive
 
-# install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip git curl wget ca-certificates \
-    fontconfig fonts-dejavu-core \
-    libass9 libfreetype6 libharfbuzz0b libvorbis0a libopus0 \
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    xz-utils \
+    tar \
+    python3 \
+    python3-pip \
+    python3-venv \
+    ca-certificates \
+    libass9 \
+    libfreetype6 \
+    libfontconfig1 \
+    libxcb1 \
+    libx11-6 \
+    libxext6 \
+    libxfixes3 \
+    libopus0 \
     && rm -rf /var/lib/apt/lists/*
 
-# install latest SHARED ffmpeg
+# Install STATIC FFmpeg (no dependencies needed)
 RUN cd /tmp && \
-    wget -q https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-linux64-gpl-shared.tar.xz && \
-    tar -xf ffmpeg-master-latest-linux64-gpl-shared.tar.xz && \
-    mv ffmpeg-master-latest-linux64-gpl-shared/bin/* /usr/local/bin/ && \
+    wget -q https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-linux64-gpl.tar.xz && \
+    tar -xf ffmpeg-master-latest-linux64-gpl.tar.xz && \
+    mv ffmpeg-master-latest-linux64-gpl/bin/* /usr/local/bin/ && \
     rm -rf /tmp/*
 
-COPY requirements.txt .
+# Check ffmpeg
+RUN ffmpeg -version
+
+WORKDIR /app
+COPY . /app
+
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY . .
-RUN chmod -R 755 /app
-
-CMD ["bash", "start.sh"]
+CMD ["python3", "main.py"]
